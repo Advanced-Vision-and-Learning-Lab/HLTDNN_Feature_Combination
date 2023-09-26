@@ -118,7 +118,6 @@ class DeepShipSegments(Dataset):
         #     feat = feature.view(feature.size(0), feature.size(1), -1)
         #     print('resized feat shape: ', feat.shape)
         #     resized_features.append(feat)
-
         combined_features = torch.cat(combined_features, dim=0)
         # print('combined_features shape: ', combined_features.shape)
         label = torch.tensor(label)

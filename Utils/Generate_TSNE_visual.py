@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from matplotlib import offsetbox
 from Utils.Compute_FDR import Compute_Fisher_Score
+import pdb
 
 def plot_components(data, proj, images=None, ax=None,
                     thumb_frac=0.05, cmap='copper'):
@@ -49,13 +50,15 @@ def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names,
             saved_imgs = []
             for idx, (inputs, classes,index)  in enumerate(dataloaders_dict[phase]):
                 images = inputs.to(device)
-                img_reshape = images.view(images.size(0), 1, images.size(2), -1)
-                images = img_reshape
+                # pdb.set_trace()
+                # img_reshape = images.view(images.size(0), 1, images.size(2), -1)
+                # images = img_reshape
                 labels = classes.to(device, torch.long)
                 indices  = index.to(device).cpu().numpy()
                 
                 GT_val = np.concatenate((GT_val, labels.cpu().numpy()),axis = None)
                 indices_train = np.concatenate((indices_train,indices),axis = None)
+                
                 
                 features = model(images)
                     
@@ -65,7 +68,8 @@ def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names,
                 
                 features_extracted.append(features)
                 saved_imgs.append(images.cpu().permute(0,2,3,1).numpy())
-         
+                break
+            
       
             features_extracted = np.concatenate(features_extracted,axis=0)
             saved_imgs = np.concatenate(saved_imgs,axis=0)
@@ -98,8 +102,8 @@ def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names,
             
             #Plot tSNE with images
             fig9, ax9 = plt.subplots()
-            plot_components(features_extracted,features_embedded,thumb_frac=0.1,
-                            images=saved_imgs,cmap=None)
+            # plot_components(features_extracted,features_embedded,thumb_frac=0.1,
+            #                 images=saved_imgs,cmap=None)
             plt.grid('off')
             plt.axis('off')
             

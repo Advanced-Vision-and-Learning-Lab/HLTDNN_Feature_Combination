@@ -12,6 +12,11 @@ import pickle
 ## PyTorch dependencies
 import torch
 
+def get_feature_name(features):
+    filename = ''
+    for i in range(0, len(features)):
+        filename = filename + features[i]
+    return filename
 
 def get_file_location(Network_parameters,split):
     
@@ -24,14 +29,14 @@ def get_file_location(Network_parameters,split):
                                              Network_parameters['mode'],
                                              Network_parameters['Dataset'],
                                              Network_parameters['hist_model'],
-                                             Network_parameters['feature'],
+                                             get_feature_name(Network_parameters['feature']),
                                              str(split + 1))
             else:
                 filename = '{}/{}/{}/{}/Series/{}/Run_{}/'.format(Network_parameters['folder'],
                                              Network_parameters['mode'],
                                              Network_parameters['Dataset'],
                                              Network_parameters['hist_model'],
-                                             Network_parameters['feature'],
+                                             get_feature_name(Network_parameters['feature']),
                                              str(split + 1))
         else:
             if (Network_parameters['parallel']):
@@ -54,7 +59,7 @@ def get_file_location(Network_parameters,split):
                                          Network_parameters['mode'],
                                          Network_parameters['Dataset'],
                                          Network_parameters['Model_name'],
-                                         Network_parameters['feature'],
+                                         get_feature_name(Network_parameters['feature']),
                                          str(split + 1))
         else:
             
@@ -75,8 +80,8 @@ def save_results(train_dict, test_dict, split, Network_parameters, num_params):
         os.makedirs(filename)
         
     #Save training and testing dictionary, save model using torch
-    print("train_dict['best_model_wts']: ", train_dict['best_model_wts'])
-    torch.save(train_dict['best_model_wts'][0] + train_dict['best_model_wts'][1], filename + 'Best_Weights.pt')
+    print("filename", filename)
+    torch.save(train_dict['best_model_wts'], filename + 'Best_Weights.pt')
     
     #Remove model from training dictionary
     train_dict.pop('best_model_wts')

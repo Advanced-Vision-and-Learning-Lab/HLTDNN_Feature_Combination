@@ -61,7 +61,7 @@ def main(Params):
     print("feature_layer:", feature_layer)
     
     print('Starting Experiments...')
-    for split in range(2, numRuns):
+    for split in range(0, numRuns):
         
         #Set random state for reproducibility
         torch.manual_seed(split)

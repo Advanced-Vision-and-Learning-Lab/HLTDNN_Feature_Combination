@@ -31,7 +31,7 @@ from Utils.RBFHistogramPooling import HistogramLayer
 from Utils.Confusion_mats import plot_confusion_matrix, plot_avg_confusion_matrix
 from Utils.Generate_Learning_Curves import Plot_Learning_Curves
 from Utils.Save_Results import get_file_location
-from Datasets.Feature_Extraction_Layer import Feature_Extraction_Layer
+import pdb
 
 plt.ioff()
 
@@ -72,7 +72,7 @@ def main(Params):
     accuracy = np.zeros(NumRuns)
     MCC = np.zeros(NumRuns)
     
-    for split in range(0, NumRuns):
+    for split in range(2, NumRuns):
         
        
         #Find directory of results
@@ -88,8 +88,6 @@ def main(Params):
         test_pkl_file.close()
 
         print('Audio Features: ' + str(Params['feature']))
-        feature_extraction_layer = Feature_Extraction_Layer(Params['feature'])
-        print('demo feature extraction layer: ', feature_extraction_layer)
     
         # Remove pickle files
         del train_pkl_file, test_pkl_file
@@ -113,8 +111,7 @@ def main(Params):
                                               add_bn=Params['add_bn'],
                                               scale=Params['scale'],
                                               feat_map_size=feat_map_size,
-                                              TDNN_feats=Params['TDNN_feats'][Dataset],
-                                              input_features=feature_extraction_layer)
+                                              TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])))
     
         # Set device to cpu or gpu (if available)
         device_loc = torch.device(device)
@@ -255,7 +252,7 @@ def parse_args():
                         help='Flag for feature extraction. False, train whole model. True, only update fully connected and histogram layers parameters (default: True)')
     parser.add_argument('--use_pretrained', default=True, action=argparse.BooleanOptionalAction,
                         help='Flag to use pretrained model from ImageNet or train from scratch (default: True)')
-    parser.add_argument('--train_batch_size', type=int, default=128,
+    parser.add_argument('--train_batch_size', type=int, default=256,
                         help='input batch size for training (default: 128)')
     parser.add_argument('--val_batch_size', type=int, default=256,
                         help='input batch size for validation (default: 512)')
