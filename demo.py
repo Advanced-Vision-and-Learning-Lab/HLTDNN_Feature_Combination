@@ -23,7 +23,6 @@ from Utils.Save_Results import save_results
 from Utils.Get_Optimizer import get_optimizer
 from Demo_Parameters import Parameters
 from Prepare_Data import Prepare_DataLoaders
-from Datasets.Feature_Extraction_Layer import Feature_Extraction_Layer
 
 def main(Params):
     
@@ -49,16 +48,6 @@ def main(Params):
     # Detect if we have a GPU available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Using", torch.cuda.device_count(), "GPUs!")
-
-    # Create an instance of Feature_Extraction_Layer
-    input_features = ['Mel_Spectrogram', 'MFCC']
-    feature_layer = Feature_Extraction_Layer(input_features)
-
-    # Inspect the attributes
-    print("Number of input features:", feature_layer.num_input_features)
-    print("Train feature transforms:", feature_layer.train_feature_transforms)
-    print("Test feature transforms:", feature_layer.test_feature_transforms)
-    print("feature_layer:", feature_layer)
     
     print('Starting Experiments...')
     for split in range(0, numRuns):
@@ -77,8 +66,6 @@ def main(Params):
         saved_widths = np.zeros((Params['num_epochs'] + 1,
                                  numBins * int(num_feature_maps / (feat_map_size * numBins))))
         print('Audio Features: ' + str(Params['feature']))
-        feature_extraction_layer = Feature_Extraction_Layer(Params['feature'])
-        print('demo feature extraction layer: ', feature_extraction_layer)
 
         histogram_layer = HistogramLayer(int(num_feature_maps / (feat_map_size * numBins)),
                                          Params['kernel_size'][model_name],
@@ -101,8 +88,7 @@ def main(Params):
                                                 add_bn=Params['add_bn'],
                                                 scale=Params['scale'],
                                                 feat_map_size=feat_map_size,
-                                                TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])),
-                                                input_features=feature_extraction_layer,
+                                                TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature']))
                                                 )
 
         # Send the model to GPU if available, use multiple if available
@@ -206,7 +192,7 @@ def parse_args():
     parser.add_argument('--resize_size', type=int, default=256,
                         help='Resize the image before center crop. (default: 256)')
     parser.add_argument('--lr', type=float, default=.001,
-                        help='learning rate (default: 0.01)')
+                        help='learning rate (default: 0.001)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
     parser.add_argument('--audio_feature', nargs='+', default=['STFT'],

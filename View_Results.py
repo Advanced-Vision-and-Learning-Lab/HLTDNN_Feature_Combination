@@ -72,7 +72,7 @@ def main(Params):
     accuracy = np.zeros(NumRuns)
     MCC = np.zeros(NumRuns)
     
-    for split in range(2, NumRuns):
+    for split in range(0, NumRuns):
         
        
         #Find directory of results

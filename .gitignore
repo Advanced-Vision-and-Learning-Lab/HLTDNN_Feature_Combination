@@ -2,3 +2,5 @@ Datasets/DeepShip/
 Datasets/__pycache__/
 Utils/__pycache__/
 __pycache__/
+Saved_Models/
+git rm -r directory_name

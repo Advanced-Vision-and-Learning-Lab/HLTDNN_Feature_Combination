@@ -84,17 +84,6 @@ class DeepShipSegments(Dataset):
     def __getitem__(self, idx):
         file_path, label = self.segment_lists[self.partition][idx]
         signal, sr = torchaudio.load(file_path, normalize = True)
-
-        # signal = signal.to(device)  # Move data to the device if needed
-        # move signal to device
-        # define device
-        # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        # signal = signal.to(device)
-        # if self.feature_extraction_layer is None:
-        #     raise RuntimeError("Feature extraction layer is not defined.")
-
-        # extracted_features = self.feature_extraction_layer(signal)
-        # extracted_features = model.feature_extraction_layer(signal)
         # pdb.set_trace()
         combined_features = []
         if self.features:
@@ -112,12 +101,6 @@ class DeepShipSegments(Dataset):
                 
                 combined_features.append(transformed_signal)
         
-        # resized_features = []
-        # for feature in combined_features:
-        #     print('feature.shape: ', feature.shape)
-        #     feat = feature.view(feature.size(0), feature.size(1), -1)
-        #     print('resized feat shape: ', feat.shape)
-        #     resized_features.append(feat)
         combined_features = torch.cat(combined_features, dim=0)
         # print('combined_features shape: ', combined_features.shape)
         label = torch.tensor(label)
