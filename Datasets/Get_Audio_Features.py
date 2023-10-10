@@ -22,7 +22,7 @@ def vqt_lib(x):
     return signal
 
 def Get_Audio_Features(feature, sample_rate=16000, window_length=250, 
-                       hop_length=64, RGB=False, pretrained=False):
+                       hop_length=64, RGB=False, pretrained=False, device="cpu"):
     
     #Convert window and hop length to ms
     window_length /= 1000
@@ -37,42 +37,22 @@ def Get_Audio_Features(feature, sample_rate=16000, window_length=250,
     if feature == 'Mel_Spectrogram':
         #Return Mel Spectrogram that is 48 x 48
         
-        signal_transform = T.MelSpectrogram(sample_rate,n_mels=40,win_length=int(window_length*sample_rate),
+        signal_transform = features.mel.MelSpectrogram(sample_rate,n_mels=40,win_length=int(window_length*sample_rate),
                                             hop_length=int(hop_length*sample_rate),
                                             n_fft=int(window_length*sample_rate))
-        
-        train_transforms = transforms.Compose([
-            signal_transform,
-            transforms.Pad((1,4,0,4)),
-            # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-        ])
-        
-        test_transforms = transforms.Compose([
-                signal_transform,
-                transforms.Pad((1,4,0,4)),
-                # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-            ])
+
+        #Amount to pad feature
+        padding = (1,4,0,4)
         
        
     elif feature == 'MFCC':
         #Return MFCC that is 16 x 48
-        signal_transform = T.MFCC(sample_rate=sample_rate, n_mfcc=16, 
-                                        melkwargs={"n_fft": int(window_length*sample_rate), 
-                                                   "win_length": int(window_length*sample_rate), 
-                                                   "hop_length": int(hop_length*sample_rate),
-                                                   "n_mels": 48, "center": False})
-        
-        train_transforms = transforms.Compose([
-            signal_transform,
-            transforms.Pad((1,0,4,0)),
-            # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-    
-        ])
-        test_transforms = transforms.Compose([
-                signal_transform,
-                transforms.Pad((1,0,4,0)),
-                # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-            ])
+        signal_transform = features.mel.MFCC(sr=sample_rate, n_mfcc=16, 
+                                        n_fft=int(window_length*sample_rate), 
+                                                   win_length=int(window_length*sample_rate), 
+                                                   hop_length=int(hop_length*sample_rate),
+                                                   n_mels=48, center=False)
+        padding = (1,0,0,0)
         
 
     elif feature == 'STFT': 
@@ -82,19 +62,7 @@ def Get_Audio_Features(feature, sample_rate=16000, window_length=250,
                                          win_length=int(window_length*sample_rate), 
                                          output_format='Magnitude',
                                          freq_bins=48,verbose=False)
-            
-        train_transforms = transforms.Compose([
-            signal_transform,
-            transforms.Pad((1,0,0,0)),
-            # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-        ])
-
-        
-        test_transforms = transforms.Compose([
-                signal_transform,
-                transforms.Pad((1,0,0,0)),
-                # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-            ])
+        padding = (1,0,0,0)
         
     elif feature == 'GFCC':
         #Return GFCC that is 64 x 48
@@ -102,72 +70,42 @@ def Get_Audio_Features(feature, sample_rate=16000, window_length=250,
                                                   hop_length=int(hop_length*sample_rate),
                                                   n_fft=int(window_length*sample_rate),
                                                   verbose=False,n_bins=64)
+        padding = (1,0,0,0)
         
-        train_transforms = transforms.Compose([
-            signal_transform,
-            transforms.Pad((1,0,0,0)),
-            # transforms.Lambda(lambda x: x.repeat(num_channels,1,1))
-        ])
-
-        test_transforms = transforms.Compose([
-                signal_transform,
-                transforms.Pad((1,0,0,0)),
-                # transforms.Lambda(lambda x: x.repeat(num_channels,1,1))
-            ])
 
     elif feature == 'CQT':
         #Return CQT that is 64 x 48
         signal_transform = features.CQT(sr=sample_rate, n_bins=64, 
                                         hop_length=int(hop_length*sample_rate),
                                         verbose=False)
-        
-        train_transforms = transforms.Compose([
-            signal_transform,
-            transforms.Pad((1,0,0,0)),
-            # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-        ])
-
-        test_transforms = transforms.Compose([
-                signal_transform,
-                transforms.Pad((1,0,0,0)),
-                # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-            ])
+        padding = (1,0,0,0)
         
     elif feature == 'VQT':
         #Return VQT that is 64 x 48
 
-        train_transforms = transforms.Compose([
-            transforms.Lambda(vqt_lib),
-            transforms.Pad((1,0,0,0)),
-            # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-        ])
-
-    
-        test_transforms = transforms.Compose([
-                transforms.Lambda(vqt_lib),
-                transforms.Pad((1,0,0,0)),
-                # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-            ])
-        # signal_transform = features.VQT(sr=sample_rate,hop_length=int(hop_length*sample_rate),
-        #                                 n_bins=64,earlydownsample=False,verbose=False)
-
-        # train_transforms = transforms.Compose([
-        #     signal_transform,
-        #     transforms.Pad((1,0,0,0)),
-        #     # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-        # ])
-
-    
-        # test_transforms = transforms.Compose([
-        #         signal_transform,
-        #         transforms.Pad((1,0,0,0)),
-        #         # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
-        #     ])
+        signal_transform = features.VQT(sr=sample_rate,hop_length=int(hop_length*sample_rate),
+                                        n_bins=64,earlydownsample=False,verbose=False)
+        padding = (1,0,0,0)
 
     else:
         raise RuntimeError('{} not implemented'.format(feature))
             
-    
+    signal_transform = signal_transform.to(device)
+
+
+    train_transforms = transforms.Compose([
+        signal_transform,
+        transforms.Pad(padding),
+        # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
+    ])
+
+
+    test_transforms = transforms.Compose([
+        signal_transform,
+        transforms.Pad(padding),
+        # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
+    ])
+
     #If pretrained, add ImageNet normalization
     if (pretrained and RGB):
         norm_transform = transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])

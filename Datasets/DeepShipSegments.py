@@ -16,7 +16,7 @@ import pdb
 class DeepShipSegments(Dataset):
     def __init__(self, parent_folder, train_split=.7,val_test_split=.5,
                  partition='train', random_seed= 42, shuffle = False, transform=None, 
-                 target_transform=None, features=None):
+                 target_transform=None, features=None, device='cpu'):
         self.parent_folder = parent_folder
         self.folder_lists = {
             'train': [],
@@ -33,6 +33,7 @@ class DeepShipSegments(Dataset):
         self.class_mapping = {'Cargo': 0, 'Passengership': 1, 'Tanker': 2, 'Tug': 3}
         # self.feature_extraction_layer = feature_extraction_layer
         self.features = features
+        self.device = device
 
         # Loop over each label and subfolder
         for label in ['Cargo', 'Passengership', 'Tanker', 'Tug']:
@@ -84,11 +85,12 @@ class DeepShipSegments(Dataset):
     def __getitem__(self, idx):
         file_path, label = self.segment_lists[self.partition][idx]
         signal, sr = torchaudio.load(file_path, normalize = True)
+        signal = signal.to(self.device)
         # pdb.set_trace()
         combined_features = []
         if self.features:
             for feature in self.features:
-                data_transforms = Get_Audio_Features(feature)
+                data_transforms = Get_Audio_Features(feature=feature, device=self.device)
                 # if feature == 'VQT':
                 #     pdb.set_trace()
                 if self.partition == 'train':

@@ -64,6 +64,8 @@ class TDNN(nn.Module):
         '''
 
         #Pass through feature extraction layers
+        print("TDNN")
+        print(x.shape)
         x = self.conv1(x)
         x = self.nonlinearity(x)
         x = self.maxpool1(x)

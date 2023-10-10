@@ -5,11 +5,13 @@ import numpy as np
 import torch.nn as nn
 import torch
 from torchvision import models
+from nnAudio import features
 
 ## Local external libraries
 from Utils.TDNN import TDNN
 from Utils.Generate_Spatial_Dims import generate_spatial_dimensions
 import pdb
+from matplotlib import pyplot as plt 
 
 class HistRes(nn.Module):
     
@@ -94,13 +96,17 @@ class HistRes(nn.Module):
         if self.fc is None:
             self.fc = self.backbone.fc
             self.backbone.fc = torch.nn.Sequential()
+            
+        # self.VQT = features.VQT(sr=16000,hop_length=int((64/1000)*16000),
+        #                                 n_bins=64,earlydownsample=False,verbose=False)
         
         
     def forward(self,x):
 
         #Only use histogram features at end of network
-        print(x.shape)
+        # x = self.VQT(x).unsqueeze(1)
        
+            
         if self.model_name == 'densenet121':
             x = self.backbone(x).unsqueeze(2).unsqueeze(3)
         

@@ -75,7 +75,9 @@ def train_model(model, dataloaders, criterion, optimizer, device,
                     # print('inputs shape in train: ', inputs.shape)
                     # print('inputs type: ', type(inputs))
                     # print('inputs reshape in train: ', inputs.shape)
-                    print(inputs.shape)
+                    # print(inputs.shape)
+                    # print(model)
+                    # pdb.set_trace()
                     outputs = model(inputs)
                     loss = criterion(outputs, labels)
     

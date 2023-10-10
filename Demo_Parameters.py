@@ -93,7 +93,7 @@ def Parameters(args):
     # center_size = 224
     
     #Pin memory for dataloader (set to True for experiments)
-    pin_memory = True
+    pin_memory = False
     
     #Set number of workers, i.e., how many subprocesses to use for data loading.
     #Usually set to 0 or 1. Can set to more if multiple machines are used.

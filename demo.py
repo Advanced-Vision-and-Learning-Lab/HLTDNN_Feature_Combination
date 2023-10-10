@@ -100,7 +100,7 @@ def main(Params):
         print("Initializing Datasets and Dataloaders...")
 
         # Create training and validation dataloaders
-        dataloaders_dict = Prepare_DataLoaders(Params, split)
+        dataloaders_dict = Prepare_DataLoaders(Params, device)
 
         # Save the initial values for bins and widths of histogram layer
         # Set optimizer for model
@@ -185,7 +185,7 @@ def parse_args():
                         help='learning rate (default: 0.001)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['STFT'],
+    parser.add_argument('--audio_feature', nargs='+', default=['MFCC'],
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')
