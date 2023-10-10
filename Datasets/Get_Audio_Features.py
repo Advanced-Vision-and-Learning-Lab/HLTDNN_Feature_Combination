@@ -8,7 +8,18 @@ Generate audio feature transforms
 from torchvision import transforms
 import torchaudio.transforms as T
 from nnAudio import features
+import librosa
+import numpy as np
+import pdb
+import torch
 
+
+def vqt_lib(x):
+    x_numpy = x.numpy().astype(np.float32)
+    signal = librosa.vqt(x_numpy, sr=16000,hop_length=int((64/1000)*16000),
+                                        n_bins=64)
+    signal = torch.from_numpy(signal)
+    return signal
 
 def Get_Audio_Features(feature, sample_rate=16000, window_length=250, 
                        hop_length=64, RGB=False, pretrained=False):
@@ -124,21 +135,34 @@ def Get_Audio_Features(feature, sample_rate=16000, window_length=250,
         
     elif feature == 'VQT':
         #Return VQT that is 64 x 48
-        signal_transform = features.VQT(sr=sample_rate,hop_length=int(hop_length*sample_rate),
-                                        n_bins=64,earlydownsample=False,verbose=False)
 
         train_transforms = transforms.Compose([
-            signal_transform,
+            transforms.Lambda(vqt_lib),
             transforms.Pad((1,0,0,0)),
             # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
         ])
 
     
         test_transforms = transforms.Compose([
-                signal_transform,
+                transforms.Lambda(vqt_lib),
                 transforms.Pad((1,0,0,0)),
                 # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
             ])
+        # signal_transform = features.VQT(sr=sample_rate,hop_length=int(hop_length*sample_rate),
+        #                                 n_bins=64,earlydownsample=False,verbose=False)
+
+        # train_transforms = transforms.Compose([
+        #     signal_transform,
+        #     transforms.Pad((1,0,0,0)),
+        #     # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
+        # ])
+
+    
+        # test_transforms = transforms.Compose([
+        #         signal_transform,
+        #         transforms.Pad((1,0,0,0)),
+        #         # transforms.Lambda(lambda x: x.repeat(num_channels,1,1)),
+        #     ])
 
     else:
         raise RuntimeError('{} not implemented'.format(feature))

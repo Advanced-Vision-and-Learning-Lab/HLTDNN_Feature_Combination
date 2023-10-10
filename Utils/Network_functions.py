@@ -20,6 +20,7 @@ from Utils.Histogram_Model import HistRes
 from barbar import Bar
 from .pytorchtools import EarlyStopping
 from Utils.TDNN import TDNN
+import pdb
 
 def train_model(model, dataloaders, criterion, optimizer, device,
                 saved_bins=None, saved_widths=None, histogram=True,
@@ -44,12 +45,10 @@ def train_model(model, dataloaders, criterion, optimizer, device,
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
-        print('Training Model...')
 
 
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
-            print('Training Model...')
 
             if phase == 'train':
                 model.train()  # Set model to training mode 
@@ -60,9 +59,9 @@ def train_model(model, dataloaders, criterion, optimizer, device,
             running_corrects = 0
             # Iterate over data.
             for idx, (inputs, labels, index) in enumerate(Bar(dataloaders[phase])):
-                print('Training Model...')
                 
                 inputs = inputs.to(device)
+
                 labels = labels.to(device)
                 index = index.to(device)
     
@@ -73,12 +72,10 @@ def train_model(model, dataloaders, criterion, optimizer, device,
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'train'):
                     # Get model outputs and calculate loss
-                    print('inputs shape in train: ', inputs.shape)
-                    print('inputs type: ', type(inputs))
-                    print('inputs reshape in train: ', inputs.shape)
-
-                    # print('Model device: ', next(model.parameters()).device)
-                    #print('inputs: ', inputs)
+                    # print('inputs shape in train: ', inputs.shape)
+                    # print('inputs type: ', type(inputs))
+                    # print('inputs reshape in train: ', inputs.shape)
+                    print(inputs.shape)
                     outputs = model(inputs)
                     loss = criterion(outputs, labels)
     

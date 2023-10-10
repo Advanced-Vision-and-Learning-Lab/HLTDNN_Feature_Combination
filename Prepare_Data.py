@@ -32,11 +32,6 @@ def Prepare_DataLoaders(Network_parameters, split):
         RGB = True
         
     if Dataset == 'DeepShip':
-        #data_transforms = Get_Audio_Features(Network_parameters['feature'],RGB=RGB)
-        #data_transforms = Feature_Extraction_Layer(Network_parameters['feature'])
-        print('Network_parameters[feature]: ', Network_parameters['feature'])
-        # feature_extraction_layer = Feature_Extraction_Layer(Network_parameters['feature'])
-        # print('feature extraction layer: ', feature_extraction_layer)
         train_dataset = DeepShipSegments(data_dir, partition='train', features=Network_parameters['feature'])
         val_dataset = DeepShipSegments(data_dir, partition='val', features=Network_parameters['feature'])
         test_dataset = DeepShipSegments(data_dir, partition='test', features=Network_parameters['feature'])        

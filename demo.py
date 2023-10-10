@@ -65,7 +65,6 @@ def main(Params):
                                numBins * int(num_feature_maps / (feat_map_size * numBins))))
         saved_widths = np.zeros((Params['num_epochs'] + 1,
                                  numBins * int(num_feature_maps / (feat_map_size * numBins))))
-        print('Audio Features: ' + str(Params['feature']))
 
         histogram_layer = HistogramLayer(int(num_feature_maps / (feat_map_size * numBins)),
                                          Params['kernel_size'][model_name],
@@ -73,7 +72,6 @@ def main(Params):
                                          normalize_count=Params['normalize_count'],
                                          normalize_bins=Params['normalize_bins'])
 
-        print('demo histogram layer: ', histogram_layer)
 
         # Initialize the histogram model for this run
         model_ft, input_size = initialize_model(model_name, num_classes,
@@ -97,12 +95,8 @@ def main(Params):
             # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
         model_ft = nn.DataParallel(model_ft)
         model_ft = model_ft.to(device)
-        print('Model initialized')
-        print(model_ft)
-
         # Print number of trainable parameters
         num_params = sum(p.numel() for p in model_ft.parameters() if p.requires_grad)
-        print("Number of parameters: %d" % (num_params))
         print("Initializing Datasets and Dataloaders...")
 
         # Create training and validation dataloaders
@@ -110,7 +104,6 @@ def main(Params):
 
         # Save the initial values for bins and widths of histogram layer
         # Set optimizer for model
-        print('before saving initial values')
         if (Params['histogram']):
             reduced_dim = int((num_feature_maps / feat_map_size) / (numBins))
             if (Params['in_channels'][model_name] == reduced_dim):
@@ -128,7 +121,6 @@ def main(Params):
             saved_bins = None
             saved_widths = None
             dim_reduced = None
-        print('after saving initial values')
         # Setup the loss fxn and scheduler
         criterion = nn.CrossEntropyLoss()
         scheduler = None
@@ -136,7 +128,6 @@ def main(Params):
         # Define optimizer for updating weights
         params = model_ft.parameters()
         optimizer_ft = get_optimizer(params, Params['optimizer'], lr=Params['lr'])
-        print('before training')
         # Train and evaluate
         train_dict = train_model(model_ft, dataloaders_dict, criterion, 
                                  optimizer_ft, 
@@ -146,7 +137,6 @@ def main(Params):
                                  num_epochs=Params['num_epochs'],
                                  scheduler=scheduler,
                                  dim_reduced=dim_reduced)
-        print('after training')
         test_dict = test_model(dataloaders_dict['test'], model_ft, criterion,
                                device)
 

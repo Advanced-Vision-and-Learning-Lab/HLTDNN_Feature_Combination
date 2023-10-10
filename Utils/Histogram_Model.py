@@ -9,6 +9,7 @@ from torchvision import models
 ## Local external libraries
 from Utils.TDNN import TDNN
 from Utils.Generate_Spatial_Dims import generate_spatial_dimensions
+import pdb
 
 class HistRes(nn.Module):
     
@@ -98,7 +99,7 @@ class HistRes(nn.Module):
     def forward(self,x):
 
         #Only use histogram features at end of network
-        
+        print(x.shape)
        
         if self.model_name == 'densenet121':
             x = self.backbone(x).unsqueeze(2).unsqueeze(3)

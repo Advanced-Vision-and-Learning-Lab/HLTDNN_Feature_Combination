@@ -89,7 +89,8 @@ class DeepShipSegments(Dataset):
         if self.features:
             for feature in self.features:
                 data_transforms = Get_Audio_Features(feature)
-                # print('data_transforms: ', data_transforms)
+                # if feature == 'VQT':
+                #     pdb.set_trace()
                 if self.partition == 'train':
                     temp_transform = data_transforms['train']
                 else:
@@ -100,11 +101,9 @@ class DeepShipSegments(Dataset):
                 # print('transfrom shape: ', transformed_signal.shape)
                 
                 combined_features.append(transformed_signal)
-        
         combined_features = torch.cat(combined_features, dim=0)
         # print('combined_features shape: ', combined_features.shape)
         label = torch.tensor(label)
-        # pdb.set_trace()
         if self.target_transform:
             label = self.target_transform(label)
 
