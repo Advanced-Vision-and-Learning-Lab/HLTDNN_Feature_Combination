@@ -74,7 +74,7 @@ def main(Params):
 
 
         # Initialize the histogram model for this run
-        model_ft, input_size = initialize_model(model_name, num_classes,
+        model_ft, input_size, feature_extraction_layer = initialize_model(model_name, num_classes,
                                                 Params['in_channels'][model_name],
                                                 # len(Params['feature']),
                                                 num_feature_maps,
@@ -86,8 +86,8 @@ def main(Params):
                                                 add_bn=Params['add_bn'],
                                                 scale=Params['scale'],
                                                 feat_map_size=feat_map_size,
-                                                TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature']))
-                                                )
+                                                TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])),
+                                                input_features = Params['feature'])
 
         # Send the model to GPU if available, use multiple if available
         if torch.cuda.device_count() > 1:
@@ -95,12 +95,13 @@ def main(Params):
             # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
         model_ft = nn.DataParallel(model_ft)
         model_ft = model_ft.to(device)
+        feature_extraction_layer = feature_extraction_layer.to(device)
         # Print number of trainable parameters
         num_params = sum(p.numel() for p in model_ft.parameters() if p.requires_grad)
         print("Initializing Datasets and Dataloaders...")
 
         # Create training and validation dataloaders
-        dataloaders_dict = Prepare_DataLoaders(Params, device)
+        dataloaders_dict = Prepare_DataLoaders(Params)
 
         # Save the initial values for bins and widths of histogram layer
         # Set optimizer for model
@@ -132,12 +133,13 @@ def main(Params):
         train_dict = train_model(model_ft, dataloaders_dict, criterion, 
                                  optimizer_ft, 
                                  device,
+                                 feature_extraction_layer,
                                  saved_bins=saved_bins, saved_widths=saved_widths,
                                  histogram=Params['histogram'],
                                  num_epochs=Params['num_epochs'],
                                  scheduler=scheduler,
                                  dim_reduced=dim_reduced)
-        test_dict = test_model(dataloaders_dict['test'], model_ft, criterion,
+        test_dict = test_model(dataloaders_dict['test'], model_ft, feature_extraction_layer,criterion,
                                device)
 
         # Save results

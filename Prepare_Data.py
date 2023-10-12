@@ -17,7 +17,7 @@ from Datasets.Get_Audio_Features import Get_Audio_Features
 from Datasets.Feature_Extraction_Layer import Feature_Extraction_Layer
 
 
-def Prepare_DataLoaders(Network_parameters, device):
+def Prepare_DataLoaders(Network_parameters):
     
     Dataset = Network_parameters['Dataset']
     data_dir = Network_parameters['data_dir']
@@ -32,9 +32,9 @@ def Prepare_DataLoaders(Network_parameters, device):
         RGB = True
         
     if Dataset == 'DeepShip':
-        train_dataset = DeepShipSegments(data_dir, partition='train', features=Network_parameters['feature'], device=device)
-        val_dataset = DeepShipSegments(data_dir, partition='val', features=Network_parameters['feature'], device=device)
-        test_dataset = DeepShipSegments(data_dir, partition='test', features=Network_parameters['feature'], device=device)        
+        train_dataset = DeepShipSegments(data_dir, partition='train', features=Network_parameters['feature'])
+        val_dataset = DeepShipSegments(data_dir, partition='val', features=Network_parameters['feature'])
+        test_dataset = DeepShipSegments(data_dir, partition='test', features=Network_parameters['feature'])        
     else:
         raise RuntimeError('Dataset not implemented') 
 

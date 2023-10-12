@@ -21,8 +21,9 @@ from barbar import Bar
 from .pytorchtools import EarlyStopping
 from Utils.TDNN import TDNN
 import pdb
+from Datasets.Feature_Extraction_Layer import Feature_Extraction_Layer
 
-def train_model(model, dataloaders, criterion, optimizer, device,
+def train_model(model, dataloaders, criterion, optimizer, device,feature_extraction_layer,
                 saved_bins=None, saved_widths=None, histogram=True,
                 num_epochs=25, scheduler=None, dim_reduced=True):
     since = time.time()
@@ -52,8 +53,10 @@ def train_model(model, dataloaders, criterion, optimizer, device,
 
             if phase == 'train':
                 model.train()  # Set model to training mode 
+                feature_extraction_layer.train()
             else:
                 model.eval()   # Set model to evaluate mode
+                feature_extraction_layer.eval()
             
             running_loss = 0.0
             running_corrects = 0
@@ -72,13 +75,10 @@ def train_model(model, dataloaders, criterion, optimizer, device,
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'train'):
                     # Get model outputs and calculate loss
-                    # print('inputs shape in train: ', inputs.shape)
-                    # print('inputs type: ', type(inputs))
-                    # print('inputs reshape in train: ', inputs.shape)
-                    # print(inputs.shape)
-                    # print(model)
-                    # pdb.set_trace()
-                    outputs = model(inputs)
+                    
+                    #Pass through feature layer 
+                    features = feature_extraction_layer(inputs)
+                    outputs = model(features)
                     loss = criterion(outputs, labels)
     
                     _, preds = torch.max(outputs, 1)
@@ -162,7 +162,7 @@ def set_parameter_requires_grad(model, feature_extracting):
             param.requires_grad = False
             
      
-def test_model(dataloader,model,criterion,device):
+def test_model(dataloader,model,feature_extraction_layer,criterion,device):
     #Initialize and accumalate ground truth, predictions, and image indices
     GT = np.array(0)
     Predictions = np.array(0)
@@ -171,6 +171,7 @@ def test_model(dataloader,model,criterion,device):
     running_corrects = 0
     running_loss = 0.0
     model.eval()
+    feature_extraction_layer.eval()
     
     # Iterate over data
     print('Testing Model...')
@@ -180,7 +181,8 @@ def test_model(dataloader,model,criterion,device):
             labels = labels.to(device)
             index = index.to(device)
             # Forward pass for logits of network
-            outputs = model(inputs)
+            features = feature_extraction_layer(inputs)
+            outputs = model(features)
             loss = criterion(outputs, labels)
            
             #Get predictions for test data
@@ -306,8 +308,10 @@ def initialize_model(model_name, num_classes, in_channels, out_channels,
     
         else:
             raise RuntimeError('{} not implemented'.format(model_name))
-        
+
+    feature_layer = Feature_Extraction_Layer(input_features=input_features)
+
     #Take model and return embedding model
-    return model_ft, input_size
+    return model_ft, input_size, feature_layer
 
 
