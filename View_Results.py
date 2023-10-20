@@ -100,7 +100,7 @@ def main(Params):
                                           normalize_bins=Params['normalize_bins'])
     
         # Initialize the histogram model for this run
-        model, input_size = initialize_model(model_name, num_classes,
+        model, input_size, feature_extraction_layer = initialize_model(model_name, num_classes,
                                               Params['in_channels'][model_name],
                                               num_feature_maps,
                                               feature_extract=Params['feature_extraction'],
@@ -130,16 +130,17 @@ def main(Params):
     
         # model.load_state_dict(train_dict['best_model_wts'])
         print('Loading model...')
-        print(model)
         model.load_state_dict(torch.load(sub_dir + 'Best_Weights.pt', map_location=device_loc))
         model = model.to(device)
+        feature_extraction_layer = feature_extraction_layer.to(device)
+
     
-        dataloaders_dict = Prepare_DataLoaders(Params, split)
+        dataloaders_dict = Prepare_DataLoaders(Params)
     
         if (Params['TSNE_visual']):
             print("Initializing Datasets and Dataloaders...")
     
-            dataloaders_dict = Prepare_DataLoaders(params, split)
+            dataloaders_dict = Prepare_DataLoaders(Params)
             print('Creating TSNE Visual...')
             
             #Remove fully connected layer
@@ -153,13 +154,12 @@ def main(Params):
                     model.fc = nn.Sequential()
                 except:
                     model.classifier = nn.Sequential()
-    
             # Generate TSNE visual
             FDR_scores[:, split], log_FDR_scores[:, split] = Generate_TSNE_visual(
                 dataloaders_dict,
                 model, sub_dir, device, class_names,
                 histogram=Params['histogram'],
-                Separate_TSNE=Params['TSNE_visual'])
+                Separate_TSNE=Params['TSNE_visual'], input_features=Params['feature'])
             
         # Create CM for testing data
         cm = confusion_matrix(test_dict['GT'], test_dict['Predictions'])

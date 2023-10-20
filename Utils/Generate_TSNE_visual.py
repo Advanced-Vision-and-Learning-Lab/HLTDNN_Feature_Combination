@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from matplotlib import offsetbox
 from Utils.Compute_FDR import Compute_Fisher_Score
+from Datasets.Get_Audio_Features import Get_Audio_Features
 import pdb
 
 def plot_components(data, proj, images=None, ax=None,
@@ -33,7 +34,7 @@ def plot_components(data, proj, images=None, ax=None,
                                       proj[i])
             ax.add_artist(imagebox)
             
-def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names,
+def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names, input_features=None,
                          histogram=True,Separate_TSNE=False):
 
       # Turn interactive plotting off, don't show plots
@@ -49,10 +50,8 @@ def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names,
             features_extracted = []
             saved_imgs = []
             for idx, (inputs, classes,index)  in enumerate(dataloaders_dict[phase]):
-                images = inputs.to(device)
-                # pdb.set_trace()
-                # img_reshape = images.view(images.size(0), 1, images.size(2), -1)
-                # images = img_reshape
+                features = Get_Audio_Features(input_features, inputs)
+                images = features.to(device)
                 labels = classes.to(device, torch.long)
                 indices  = index.to(device).cpu().numpy()
                 
