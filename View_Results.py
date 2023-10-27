@@ -86,8 +86,6 @@ def main(Params):
         test_pkl_file = open(sub_dir + 'test_dict.pkl', 'rb')
         test_dict = pickle.load(test_pkl_file)
         test_pkl_file.close()
-
-        print('Audio Features: ' + str(Params['feature']))
     
         # Remove pickle files
         del train_pkl_file, test_pkl_file
@@ -111,7 +109,7 @@ def main(Params):
                                               add_bn=Params['add_bn'],
                                               scale=Params['scale'],
                                               feat_map_size=feat_map_size,
-                                              TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])))
+                                              TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])), input_features = Params['feature'])
     
         # Set device to cpu or gpu (if available)
         device_loc = torch.device(device)
@@ -159,7 +157,7 @@ def main(Params):
                 dataloaders_dict,
                 model, sub_dir, device, class_names,
                 histogram=Params['histogram'],
-                Separate_TSNE=Params['TSNE_visual'], input_features=Params['feature'])
+                Separate_TSNE=Params['TSNE_visual'], input_features=Params['feature'], feature_layer=feature_extraction_layer)
             
         # Create CM for testing data
         cm = confusion_matrix(test_dict['GT'], test_dict['Predictions'])

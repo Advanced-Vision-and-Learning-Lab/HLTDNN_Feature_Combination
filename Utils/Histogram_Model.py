@@ -26,7 +26,6 @@ class HistRes(nn.Module):
         self.model_name = model_name
         self.bn_norm = None
         self.fc = None
-        self.dropout = None
     
         #Default to use resnet18, otherwise use Resnet50
         #Defines feature extraction backbone model and redefines linear layer
@@ -80,7 +79,8 @@ class HistRes(nn.Module):
             else:
                 pass
         
-        if self.dropout is None:
+        #Add dropout if needed
+        if self.dropout is not None:
             self.dropout = nn.Sequential()
             
         

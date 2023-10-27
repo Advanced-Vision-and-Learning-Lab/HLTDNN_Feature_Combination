@@ -12,7 +12,7 @@ import pdb
 class TDNN(nn.Module):
     
     def __init__(self, in_channels, stride=1, dilation=1, batch_norm=True,
-                num_class = 4, output_len = 1, drop_p = .5):
+                num_class = 4, output_len = 1, drop_p = .1):
         '''
         Baseline TDNN model
        

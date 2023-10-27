@@ -35,11 +35,10 @@ def plot_components(data, proj, images=None, ax=None,
             ax.add_artist(imagebox)
             
 def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names, input_features=None,
-                         histogram=True,Separate_TSNE=False):
+                         histogram=True,Separate_TSNE=False, feature_layer=None):
 
       # Turn interactive plotting off, don't show plots
         plt.ioff()
-        
       #TSNE visual of (all) data
         #Get labels and outputs
         for phase in ['train', 'val', 'test']:
@@ -47,18 +46,20 @@ def Generate_TSNE_visual(dataloaders_dict,model,sub_dir,device,class_names, inpu
             indices_train = np.array(0)
             model.eval()
             model.to(device)
+            feature_layer.eval()
+            feature_layer.to(device)
             features_extracted = []
             saved_imgs = []
             for idx, (inputs, classes,index)  in enumerate(dataloaders_dict[phase]):
-                features = Get_Audio_Features(input_features, inputs)
-                images = features.to(device)
+                # features = Get_Audio_Features(input_features, inputs)
+                images = inputs.to(device)
                 labels = classes.to(device, torch.long)
                 indices  = index.to(device).cpu().numpy()
                 
                 GT_val = np.concatenate((GT_val, labels.cpu().numpy()),axis = None)
                 indices_train = np.concatenate((indices_train,indices),axis = None)
                 
-                
+                images = feature_layer(images) 
                 features = model(images)
                     
                 features = torch.flatten(features, start_dim=1)
