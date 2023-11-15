@@ -50,5 +50,5 @@ def Prepare_DataLoaders(Network_parameters):
                                                        pin_memory=Network_parameters['pin_memory'])
                                                        for x in ['train', 'val','test']}
 
-    return dataloaders_dict
+    return dataloaders_dict, train_dataset[0][0].size()
     

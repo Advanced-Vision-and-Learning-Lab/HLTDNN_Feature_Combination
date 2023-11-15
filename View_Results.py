@@ -109,7 +109,10 @@ def main(Params):
                                               add_bn=Params['add_bn'],
                                               scale=Params['scale'],
                                               feat_map_size=feat_map_size,
-                                              TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])), input_features = Params['feature'])
+                                              TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])), 
+                                              input_features = Params['feature'],
+                                              target_height = Params['tensor_height'], 
+                                              target_width = Params['tensor_width'])
     
         # Set device to cpu or gpu (if available)
         device_loc = torch.device(device)

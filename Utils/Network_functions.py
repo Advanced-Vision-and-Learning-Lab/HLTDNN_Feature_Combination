@@ -22,6 +22,7 @@ from .pytorchtools import EarlyStopping
 from Utils.TDNN import TDNN
 import pdb
 from Datasets.Feature_Extraction_Layer import Feature_Extraction_Layer
+from Datasets.Adaptive_Pad_Layer import Adaptive_Pad_Layer
 
 def train_model(model, dataloaders, criterion, optimizer, device,feature_extraction_layer,
                 saved_bins=None, saved_widths=None, histogram=True,
@@ -213,7 +214,8 @@ def test_model(dataloader,model,feature_extraction_layer,criterion,device):
 def initialize_model(model_name, num_classes, in_channels, out_channels,
                      feature_extract=False, histogram=True, histogram_layer=None,
                      parallel=True, use_pretrained=True, add_bn=True, scale=5,
-                     feat_map_size=4, TDNN_feats=1, input_features=None):
+                     feat_map_size=4, TDNN_feats=1, input_features=None, 
+                     dataset_dimension=None):
     
     # Initialize these variables which will be set in this if statement. Each of these
     #   variables is model specific.
@@ -309,7 +311,7 @@ def initialize_model(model_name, num_classes, in_channels, out_channels,
         else:
             raise RuntimeError('{} not implemented'.format(model_name))
 
-    feature_layer = Feature_Extraction_Layer(input_features=input_features)
+    feature_layer = Feature_Extraction_Layer(input_features=input_features, dataset_dimension=dataset_dimension)
 
     #Take model and return embedding model
     return model_ft, input_size, feature_layer

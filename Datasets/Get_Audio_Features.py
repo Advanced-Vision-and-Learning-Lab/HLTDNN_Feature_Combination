@@ -16,15 +16,9 @@ import torch.nn as nn
 from nnAudio import features
 
 
-def vqt_lib(x):
-    x_numpy = x.numpy().astype(np.float32)
-    signal = librosa.vqt(x_numpy, sr=16000,hop_length=int((64/1000)*16000),
-                                        n_bins=64)
-    signal = torch.from_numpy(signal)
-    return signal
 
 def Get_Audio_Features(input_features, data, sample_rate=16000, window_length=250, 
-                       hop_length=64, RGB=False, pretrained=False, device="cpu"):
+                       hop_length=64, RGB=False, pretrained=False):
     
     #Convert window and hop length to ms
     window_length /= 1000

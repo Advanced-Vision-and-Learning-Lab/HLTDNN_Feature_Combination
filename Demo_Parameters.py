@@ -98,13 +98,17 @@ def Parameters(args):
     #Set number of workers, i.e., how many subprocesses to use for data loading.
     #Usually set to 0 or 1. Can set to more if multiple machines are used.
     #Number of workers for experiments for two GPUs was three
-    num_workers = 0
+    num_workers = 20
     
     #Output feature map size after histogram layer
     feat_map_size = 4
     
     #Select audio feature for DeepShip 
     feature = args.audio_feature
+
+    #Set desired tensor dimensions
+    target_height = 64
+    target_width = 52
     
     #Set filter size and stride based on scale
     # Current values will produce 2x2 local feature maps
@@ -214,6 +218,7 @@ def Parameters(args):
                           'Parallelize': Parallelize_model,
                           'Num_TSNE_images': Num_TSNE_images,'fig_size': fig_size,
                           'font_size': font_size, 'feature': feature, 
-                          'TDNN_feats': TDNN_feats, 'audio_features': audio_features}
+                          'TDNN_feats': TDNN_feats, 'audio_features': audio_features,
+                          'tensor_height': target_height, 'tensor_width': target_width}
     
     return Params

@@ -72,11 +72,12 @@ def main(Params):
                                          normalize_count=Params['normalize_count'],
                                          normalize_bins=Params['normalize_bins'])
 
+        # Create training and validation dataloaders
+        dataloaders_dict, dataset_dimension = Prepare_DataLoaders(Params)
 
         # Initialize the histogram model for this run
         model_ft, input_size, feature_extraction_layer = initialize_model(model_name, num_classes,
                                                 Params['in_channels'][model_name],
-                                                # len(Params['feature']),
                                                 num_feature_maps,
                                                 feature_extract=Params['feature_extraction'],
                                                 histogram=Params['histogram'],
@@ -87,7 +88,8 @@ def main(Params):
                                                 scale=Params['scale'],
                                                 feat_map_size=feat_map_size,
                                                 TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])),
-                                                input_features = Params['feature'])
+                                                input_features = Params['feature'], 
+                                                dataset_dimension = dataset_dimension)
 
         # Send the model to GPU if available, use multiple if available
         if torch.cuda.device_count() > 1:
@@ -99,9 +101,6 @@ def main(Params):
         # Print number of trainable parameters
         num_params = sum(p.numel() for p in model_ft.parameters() if p.requires_grad)
         print("Initializing Datasets and Dataloaders...")
-
-        # Create training and validation dataloaders
-        dataloaders_dict = Prepare_DataLoaders(Params)
 
         # Save the initial values for bins and widths of histogram layer
         # Set optimizer for model
