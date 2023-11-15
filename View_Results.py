@@ -96,6 +96,7 @@ def main(Params):
                                           num_bins=numBins, stride=Params['stride'],
                                           normalize_count=Params['normalize_count'],
                                           normalize_bins=Params['normalize_bins'])
+        dataloaders_dict, dataset_dimension = Prepare_DataLoaders(Params)
     
         # Initialize the histogram model for this run
         model, input_size, feature_extraction_layer = initialize_model(model_name, num_classes,
@@ -111,8 +112,7 @@ def main(Params):
                                               feat_map_size=feat_map_size,
                                               TDNN_feats=(Params['TDNN_feats'][Dataset] * len(Params['feature'])), 
                                               input_features = Params['feature'],
-                                              target_height = Params['tensor_height'], 
-                                              target_width = Params['tensor_width'])
+                                              dataset_dimension=dataset_dimension)
     
         # Set device to cpu or gpu (if available)
         device_loc = torch.device(device)
@@ -136,12 +136,11 @@ def main(Params):
         feature_extraction_layer = feature_extraction_layer.to(device)
 
     
-        dataloaders_dict = Prepare_DataLoaders(Params)
     
         if (Params['TSNE_visual']):
             print("Initializing Datasets and Dataloaders...")
     
-            dataloaders_dict = Prepare_DataLoaders(Params)
+            dataloaders_dict, dataset_dimension = Prepare_DataLoaders(Params)
             print('Creating TSNE Visual...')
             
             #Remove fully connected layer

@@ -16,8 +16,6 @@ class Feature_Extraction_Layer(nn.Module):
         #Convert window and hop length to ms
         window_length /= 1000
         hop_length /= 1000
-        self.test_tensor_height = 1
-        self.test_tensor_width = 48000
         
         if RGB:
             num_channels = 3
@@ -81,7 +79,6 @@ class Feature_Extraction_Layer(nn.Module):
 
     def forward(self, x):
         transformed_features = []
-        pdb.set_trace()
         for feature in self.input_features:
             feature_tensor = self.features[feature](x)
             padded_tensor = self.adaptive_pad_layer(feature_tensor) 
