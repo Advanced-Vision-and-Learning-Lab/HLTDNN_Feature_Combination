@@ -4,3 +4,5 @@ Utils/__pycache__/
 __pycache__/
 Saved_Models/
 bash_scripts/
+best_accuracies.csv
+output.csv
