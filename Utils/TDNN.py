@@ -27,7 +27,7 @@ class TDNN(nn.Module):
         
         
         #Define convolution layers
-        self.conv1 = nn.Conv2d(self.in_channels, 16, kernel_size=(11,11),
+        self.conv1 = nn.Conv2d(self.in_channels,16,kernel_size=(11,11),
                                padding='same',bias=True)
         self.conv2 = nn.Conv2d(16,16,kernel_size=(3,3),padding='same',bias=True)
         self.conv3 = nn.Conv2d(16,16,kernel_size=(3,3),padding='same',bias=True)

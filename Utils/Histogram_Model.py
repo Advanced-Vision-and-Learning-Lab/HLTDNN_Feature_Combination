@@ -26,6 +26,7 @@ class HistRes(nn.Module):
         self.model_name = model_name
         self.bn_norm = None
         self.fc = None
+        self.dropout = None
     
         #Default to use resnet18, otherwise use Resnet50
         #Defines feature extraction backbone model and redefines linear layer
@@ -36,11 +37,18 @@ class HistRes(nn.Module):
         elif model_name == 'resnet50':
             self.backbone = models.resnet50(pretrained=pretrained)
             num_ftrs = self.backbone.fc.in_features
+            
+            # 1x1 convolution to reduce channels
+            channel_reduction_layer = nn.Conv2d(TDNN_feats, 64, kernel_size=(1,1), padding='same', bias=True)
+            self.backbone.conv1 = channel_reduction_layer
                 
         elif model_name == "resnet50_wide":
             self.backbone = models.wide_resnet50_2(pretrained=pretrained)
             num_ftrs = self.backbone.fc.in_features
            
+            # 1x1 convolution to reduce channels
+            channel_reduction_layer = nn.Conv2d(TDNN_feats, 64, kernel_size=(1,1), padding='same', bias=True)
+            self.backbone.conv1 = channel_reduction_layer
             
         elif model_name == "resnet50_next":
             self.backbone = models.resnext50_32x4d(pretrained=pretrained)
@@ -55,11 +63,19 @@ class HistRes(nn.Module):
             self.fc = self.backbone.classifier
             self.backbone.classifier = torch.nn.Sequential()
             
+            # 1x1 convolution to reduce channels
+            chanel_reduction_layer = nn.Conv2d(TDNN_feats, 64, kernel_size=(1,1), padding='same', bias=True)
+            self.backbone.features[0] = chanel_reduction_layer
+            
         elif model_name == "efficientnet":
             self.backbone = models.efficientnet_b0(pretrained=pretrained)
             num_ftrs =  self.backbone.classifier[-1].in_features
             self.fc = self.backbone.classifier[-1]
             self.backbone.classifier[-1] = torch.nn.Sequential()
+            
+            # 1x1 convolution to reduce channels
+            channel_reduction_layer = nn.Conv2d(TDNN_feats, 32, kernel_size=(1,1), padding='same', bias=True)
+            self.backbone.features[0][0] = channel_reduction_layer
             
         elif model_name == "regnet":
             self.backbone = models.regnet_x_400mf(pretrained)
@@ -80,7 +96,7 @@ class HistRes(nn.Module):
                 pass
         
         #Add dropout if needed
-        if self.dropout is not None:
+        if self.dropout is None:
             self.dropout = nn.Sequential()
             
         
@@ -105,7 +121,12 @@ class HistRes(nn.Module):
 
         #Only use histogram features at end of network
         # x = self.VQT(x).unsqueeze(1)
-       
+        
+        # 1x1 convolution to account for in_channnels != 3
+        # if self.model_name != 'TDNN':
+        #     x = nn.Conv2d(self.in_channels, 16, kernel_size=(1,1), padding='same',bias=True)
+
+
             
         if self.model_name == 'densenet121':
             x = self.backbone(x).unsqueeze(2).unsqueeze(3)
