@@ -24,6 +24,17 @@ from Utils.Get_Optimizer import get_optimizer
 from Demo_Parameters import Parameters
 from Prepare_Data import Prepare_DataLoaders
 
+
+
+# This code uses a newer version of numpy while other packages use an older version of numpy
+# This is a simple workaround to avoid errors that arise from the deprecation of numpy data types
+np.float = float    #module 'numpy' has no attribute 'float'
+np.int = int        #module 'numpy' has no attribute 'int'
+np.object = object  #module 'numpy' has no attribute 'object'
+np.bool = bool      #module 'numpy' has no attribute 'bool'
+
+
+
 def main(Params):
     
     # Name of dataset
@@ -138,6 +149,7 @@ def main(Params):
                                  num_epochs=Params['num_epochs'],
                                  scheduler=scheduler,
                                  dim_reduced=dim_reduced)
+        
         test_dict = test_model(dataloaders_dict['test'], model_ft, feature_extraction_layer,criterion,
                                device)
 
@@ -160,9 +172,9 @@ def parse_args():
                         help='Save results of experiments (default: True)')
     parser.add_argument('--folder', type=str, default='Saved_Models/',
                         help='Location to save models')
-    parser.add_argument('--model', type=str, default='TDNN',
+    parser.add_argument('--model', type=str, default='efficientnet',
                         help='Select baseline model architecture')
-    parser.add_argument('--histogram', default=True, action=argparse.BooleanOptionalAction,
+    parser.add_argument('--histogram', default=False, action=argparse.BooleanOptionalAction,
                         help='Flag to use histogram model or baseline global average pooling (GAP), --no-histogram (GAP) or --histogram')
     parser.add_argument('--data_selection', type=int, default=0,
                         help='Dataset selection: See Demo_Parameters for full list of datasets')
@@ -178,7 +190,7 @@ def parse_args():
                         help='input batch size for validation (default: 512)')
     parser.add_argument('--test_batch_size', type=int, default=256,
                         help='input batch size for testing (default: 256)')
-    parser.add_argument('--num_epochs', type=int, default=100,
+    parser.add_argument('--num_epochs', type=int, default=1,
                         help='Number of epochs to train each model for (default: 50)')
     parser.add_argument('--resize_size', type=int, default=256,
                         help='Resize the image before center crop. (default: 256)')
@@ -186,7 +198,7 @@ def parse_args():
                         help='learning rate (default: 0.001)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['GFCC'],
+    parser.add_argument('--audio_feature', nargs='+', default=['CQT', 'VQT', 'MFCC', 'STFT'], # CQT', 'VQT', 'MFCC', 'STFT'
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')

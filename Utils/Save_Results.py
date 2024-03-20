@@ -14,8 +14,15 @@ import torch
 
 def get_feature_name(features):
     filename = ''
-    for i in range(0, len(features)):
-        filename = filename + features[i]
+    
+    delim = "_"
+ 
+    # Using map to convert each element to string 
+    temp = list(map(str, features))
+     
+    # join() used to join with delimiter
+    filename = delim.join(temp)
+    
     return filename
 
 def get_file_location(Network_parameters,split):

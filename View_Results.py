@@ -237,10 +237,10 @@ def main(Params):
 def parse_args():
     parser = argparse.ArgumentParser(description='Run histogram experiments for dataset')
     parser.add_argument('--save_results', default=True, action=argparse.BooleanOptionalAction,
-                        help='Save results of experiments(default: True)')
+                        help='Save results of experiments (default: True)')
     parser.add_argument('--folder', type=str, default='Saved_Models/',
                         help='Location to save models')
-    parser.add_argument('--model', type=str, default='TDNN',
+    parser.add_argument('--model', type=str, default='resnet50',
                         help='Select baseline model architecture')
     parser.add_argument('--histogram', default=True, action=argparse.BooleanOptionalAction,
                         help='Flag to use histogram model or baseline global average pooling (GAP), --no-histogram (GAP) or --histogram')
@@ -252,13 +252,13 @@ def parse_args():
                         help='Flag for feature extraction. False, train whole model. True, only update fully connected and histogram layers parameters (default: True)')
     parser.add_argument('--use_pretrained', default=True, action=argparse.BooleanOptionalAction,
                         help='Flag to use pretrained model from ImageNet or train from scratch (default: True)')
-    parser.add_argument('--train_batch_size', type=int, default=256,
+    parser.add_argument('--train_batch_size', type=int, default=128,
                         help='input batch size for training (default: 128)')
     parser.add_argument('--val_batch_size', type=int, default=256,
                         help='input batch size for validation (default: 512)')
     parser.add_argument('--test_batch_size', type=int, default=256,
                         help='input batch size for testing (default: 256)')
-    parser.add_argument('--num_epochs', type=int, default=100,
+    parser.add_argument('--num_epochs', type=int, default=1,
                         help='Number of epochs to train each model for (default: 50)')
     parser.add_argument('--resize_size', type=int, default=256,
                         help='Resize the image before center crop. (default: 256)')
@@ -268,7 +268,7 @@ def parse_args():
                         help='sigma for toy dataset (default: 0.1)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['STFT'],
+    parser.add_argument('--audio_feature', nargs='+', default=['CQT', 'VQT', 'MFCC', 'STFT'], # CQT', 'VQT', 'MFCC', 'STFT'
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')

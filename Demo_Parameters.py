@@ -153,7 +153,7 @@ def Parameters(args):
     #Set to false to not generate TSNE visuals
     #Number of images to view for TSNE (defaults to all training imgs unless
     #value is less than total training images).
-    TSNE_visual = True
+    TSNE_visual = False
     Num_TSNE_images = 10000
     
     #Set to True if more than one GPU was used
