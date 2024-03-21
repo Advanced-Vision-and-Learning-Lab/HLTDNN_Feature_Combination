@@ -11,6 +11,7 @@ from __future__ import division
 import numpy as np
 import argparse
 import random
+from itertools import product
 
 ## PyTorch dependencies
 import torch
@@ -23,6 +24,7 @@ from Utils.Save_Results import save_results
 from Utils.Get_Optimizer import get_optimizer
 from Demo_Parameters import Parameters
 from Prepare_Data import Prepare_DataLoaders
+import pdb
 
 
 
@@ -102,6 +104,8 @@ def main(Params):
                                                 input_features = Params['feature'], 
                                                 dataset_dimension = dataset_dimension)
 
+        #model_lighntning = Get_Lightning_Model(model_ft,feature_extraction_layer)
+        
         # Send the model to GPU if available, use multiple if available
         if torch.cuda.device_count() > 1:
             print("Using", torch.cuda.device_count(), "GPUs!")
@@ -109,6 +113,7 @@ def main(Params):
         model_ft = nn.DataParallel(model_ft)
         model_ft = model_ft.to(device)
         feature_extraction_layer = feature_extraction_layer.to(device)
+        
         # Print number of trainable parameters
         num_params = sum(p.numel() for p in model_ft.parameters() if p.requires_grad)
         print("Initializing Datasets and Dataloaders...")
@@ -172,7 +177,7 @@ def parse_args():
                         help='Save results of experiments (default: True)')
     parser.add_argument('--folder', type=str, default='Saved_Models/',
                         help='Location to save models')
-    parser.add_argument('--model', type=str, default='efficientnet',
+    parser.add_argument('--model', type=str, default='TDNN',
                         help='Select baseline model architecture')
     parser.add_argument('--histogram', default=False, action=argparse.BooleanOptionalAction,
                         help='Flag to use histogram model or baseline global average pooling (GAP), --no-histogram (GAP) or --histogram')
@@ -190,7 +195,7 @@ def parse_args():
                         help='input batch size for validation (default: 512)')
     parser.add_argument('--test_batch_size', type=int, default=256,
                         help='input batch size for testing (default: 256)')
-    parser.add_argument('--num_epochs', type=int, default=1,
+    parser.add_argument('--num_epochs', type=int, default=150,
                         help='Number of epochs to train each model for (default: 50)')
     parser.add_argument('--resize_size', type=int, default=256,
                         help='Resize the image before center crop. (default: 256)')
@@ -198,16 +203,50 @@ def parse_args():
                         help='learning rate (default: 0.001)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['CQT', 'VQT', 'MFCC', 'STFT'], # CQT', 'VQT', 'MFCC', 'STFT'
+    parser.add_argument('--audio_feature', nargs='+', default=['CQT', 'VQT', 'MFCC', 'STFT'],
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')
+    parser.add_argument('--patience', type=int, default=15,
+                        help='Number of epochs to train each model for (default: 50)')
+    parser.add_argument('--start_index', type=int, default=0,
+                    help='Start index for settings')
+    parser.add_argument('--end_index', type=int, default=21,
+                    help='End index for settings')
     args = parser.parse_args()
     return args
 
 if __name__ == "__main__":
     args = parse_args()
-    use_cuda = args.use_cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-    params = Parameters(args)
-    main(params)
+    
+    #Create feature list for all 64 combinations
+    feature_list = ['Mel_Spectrogram', 'CQT', 'VQT', 'MFCC', 'STFT', 'GFCC']
+    
+    #Generate binary combinations
+    settings = list(product((True, False), repeat=len(feature_list)))
+    
+    #Remove last feature setting
+    settings.pop(-1)
+    
+    setting_count = 1
+    
+    settings = settings[args.start_index:args.end_index]
+    
+    for setting in settings:
+        
+        #Take feature setting and select features
+        temp_features = []
+        count = 0
+        for current_feature in setting:
+            if current_feature:
+                temp_features.append(feature_list[count])
+            count += 1
+
+        setattr(args, 'audio_feature', temp_features)
+        use_cuda = args.use_cuda and torch.cuda.is_available()
+        device = torch.device("cuda" if use_cuda else "cpu")
+        params = Parameters(args)
+        main(params)
+        print('Finished setting {} of {}'.format(setting_count,len(settings)))
+        setting_count += 1
+

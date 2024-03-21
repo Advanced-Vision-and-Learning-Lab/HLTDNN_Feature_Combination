@@ -8,6 +8,7 @@ Baseline TDNN model
 import torch
 import torch.nn as nn
 import pdb
+
 #TBD: Create block of convolution, max pooling, and non-linearity
 class TDNN(nn.Module):
     

@@ -83,8 +83,11 @@ def Parameters(args):
     #training batch size is recommended to be 64. If using at least two GPUs,
     #the recommended training batch size is 128 (as done in paper)
     #May need to reduce batch size if CUDA out of memory issue occurs
+    #Patience is the number of epochs to observe if a metric (loss or accuarcy)
+    #is minimized or maximized
     batch_size = {'train': args.train_batch_size, 'val': args.val_batch_size, 'test': args.test_batch_size} 
     num_epochs = args.num_epochs
+    patience = args.patience
     
     #Resize the image before center crop. Recommended values for resize is 256 (used in paper), 384,
     #and 512 (from http://openaccess.thecvf.com/content_cvpr_2018/papers/Xue_Deep_Texture_Manifold_CVPR_2018_paper.pdf)
@@ -168,6 +171,11 @@ def Parameters(args):
     #Location of texture datasets
     Data_dirs = {'DeepShip': './Datasets/DeepShip/Segments/'}
     
+    segment_length = {'DeepShip': 3}
+    sample_rate ={'DeepShip': 16000}
+    window_length ={'DeepShip': 250}
+    hop_length = {'DeepShip': 64}
+
     #ResNet models to use for each dataset
     Model_name = args.model
     
@@ -187,6 +195,11 @@ def Parameters(args):
     Dataset = Dataset_names[data_selection]
     data_dir = Data_dirs[Dataset]
     
+    segment_length = segment_length[Dataset]
+    sample_rate = sample_rate[Dataset]
+    window_length=window_length[Dataset]
+    hop_length=hop_length[Dataset]
+
     #Save results based on features (can adapt for additional audio datasets or computer vision datasets)
     if (Dataset=='DeepShip'):
         audio_features = True
@@ -199,6 +212,8 @@ def Parameters(args):
     #Return dictionary of parameters
     Params = {'save_results': save_results,'folder': folder,
                           'histogram': histogram,'Dataset': Dataset, 'data_dir': data_dir,
+                          'segment_length':segment_length,'sample_rate':sample_rate,
+                          'window_length':window_length,'hop_length':hop_length,
                           'optimizer': optimizer,
                           'num_workers': num_workers, 'mode': mode,'lr': lr,
                           'step_size': step_size,
@@ -219,6 +234,7 @@ def Parameters(args):
                           'Num_TSNE_images': Num_TSNE_images,'fig_size': fig_size,
                           'font_size': font_size, 'feature': feature, 
                           'TDNN_feats': TDNN_feats, 'audio_features': audio_features,
-                          'tensor_height': target_height, 'tensor_width': target_width}
+                          'tensor_height': target_height, 'tensor_width': target_width,
+                          'patience': patience}
     
     return Params

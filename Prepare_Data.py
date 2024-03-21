@@ -15,13 +15,13 @@ import torch
 from Datasets.DeepShipSegments import DeepShipSegments
 from Datasets.Get_Audio_Features import Get_Audio_Features
 from Datasets.Feature_Extraction_Layer import Feature_Extraction_Layer
-
+from Datasets.Get_preprocessed_data import process_data
 
 def Prepare_DataLoaders(Network_parameters):
     
     Dataset = Network_parameters['Dataset']
     data_dir = Network_parameters['data_dir']
-    
+    process_data(sample_rate=Network_parameters['sample_rate'], segment_length=Network_parameters['segment_length'])
     #Change input to network based on models
     #If TDNN or HLTDNN, number of input features is 1
     #Else (CNN), replicate input to be 3 channels

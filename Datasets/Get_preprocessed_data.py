@@ -60,19 +60,37 @@ def Generate_Segments(dataset_dir,segments_dir,target_sr=16000,segment_length=3)
                         os.makedirs(os.path.dirname(segment_file_path), exist_ok=True)
                         sf.write(segment_file_path, output_music, samplerate=target_sr)
                         
-def parse_args():
-    parser = argparse.ArgumentParser(description='Generate segments for dataset')
-    parser.add_argument('--dataset_dir', type=str, default='./Datasets/DeepShip/',
-                        help='Location to dataset')
-    parser.add_argument('--sample_rate', type=int, default=16000,
-                        help='Sample rate for data. (default: 16kHz)')
-    parser.add_argument('--segment_length', type=float, default=3,
-                        help='segment length (in seconds) for signals after "binning" (default: 3s)')
-    args = parser.parse_args()
-    return args
+# def parse_args():
+#     parser = argparse.ArgumentParser(description='Generate segments for dataset')
+#     parser.add_argument('--dataset_dir', type=str, default='./DeepShip/',
+#                         help='Location to dataset')
+#     parser.add_argument('--sample_rate', type=int, default=16000,
+#                         help='Sample rate for data. (default: 16kHz)')
+#     parser.add_argument('--segment_length', type=float, default=3,
+#                         help='segment length (in seconds) for signals after "binning" (default: 3s)')
+#     args = parser.parse_args()
+#     return args
 
+def process_data(data_dir='./Datasets/DeepShip/', sample_rate=None, segment_length=None):
+    segments_dir = '{}Segments/'.format(data_dir)
+
+    # Check if the 'Segments' folder already exists
+    if not os.path.exists(segments_dir):
+        # If not, create the 'Segments' folder
+        os.makedirs(segments_dir)
+        print(f"Segments folder is creating at {segments_dir}")
+        # Generate segments
+        Generate_Segments(data_dir, segments_dir,
+                          target_sr=sample_rate,
+                          segment_length=segment_length)
+    else:
+        print("Segments folder already exists. Skipping segment generation.")
+        
 if __name__ == "__main__":
-    args = parse_args()
-    Generate_Segments(args.dataset_dir,'{}Segments/'.format(args.dataset_dir),
-                      target_sr=args.sample_rate,
-                      segment_length=args.segment_length)
+    process_data()
+        
+# if __name__ == "__main__":
+#     args = parse_args()
+#     Generate_Segments(args.dataset_dir,'{}Segments/'.format(args.dataset_dir),
+#                       target_sr=args.sample_rate,
+#                       segment_length=args.segment_length)
