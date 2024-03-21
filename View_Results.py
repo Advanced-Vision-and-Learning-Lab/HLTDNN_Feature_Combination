@@ -32,7 +32,7 @@ from Utils.Confusion_mats import plot_confusion_matrix, plot_avg_confusion_matri
 from Utils.Generate_Learning_Curves import Plot_Learning_Curves
 from Utils.Save_Results import get_file_location
 import pdb
-
+from itertools import product
 plt.ioff()
 
 def main(Params):
@@ -72,7 +72,7 @@ def main(Params):
     accuracy = np.zeros(NumRuns)
     MCC = np.zeros(NumRuns)
     
-    for split in range(0, NumRuns):
+    for split in range(0, NumRuns-2):
         
        
         #Find directory of results
@@ -240,9 +240,9 @@ def parse_args():
                         help='Save results of experiments (default: True)')
     parser.add_argument('--folder', type=str, default='Saved_Models/',
                         help='Location to save models')
-    parser.add_argument('--model', type=str, default='resnet50',
+    parser.add_argument('--model', type=str, default='TDNN',
                         help='Select baseline model architecture')
-    parser.add_argument('--histogram', default=True, action=argparse.BooleanOptionalAction,
+    parser.add_argument('--histogram', default=False, action=argparse.BooleanOptionalAction,
                         help='Flag to use histogram model or baseline global average pooling (GAP), --no-histogram (GAP) or --histogram')
     parser.add_argument('--data_selection', type=int, default=0,
                         help='Dataset selection: See Demo_Parameters for full list of datasets')
@@ -276,8 +276,38 @@ def parse_args():
     return args
 
 if __name__ == "__main__":
+    
+    
+    
     args = parse_args()
-    use_cuda = args.use_cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-    params = Parameters(args)
-    main(params)
+    
+    #Create feature list for all 64 combinations
+    feature_list = ['Mel_Spectrogram', 'CQT', 'VQT', 'MFCC', 'STFT', 'GFCC']
+    
+    #Generate binary combinations
+    settings = list(product((True, False), repeat=len(feature_list)))
+    
+    #Remove last feature setting
+    settings.pop(-1)
+    
+    setting_count = 1
+    
+    for setting in settings:
+        
+        #Take feature setting and select features
+        temp_features = []
+        count = 0
+        for current_feature in setting:
+            if current_feature:
+                temp_features.append(feature_list[count])
+            count += 1
+
+        setattr(args, 'audio_feature', temp_features)
+        use_cuda = args.use_cuda and torch.cuda.is_available()
+        device = torch.device("cuda" if use_cuda else "cpu")
+        params = Parameters(args)
+        main(params)
+        print('Finished setting {} of {}'.format(setting_count,len(settings)))
+        setting_count += 1    
+    
+  

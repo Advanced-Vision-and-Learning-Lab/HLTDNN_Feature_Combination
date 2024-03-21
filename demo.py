@@ -11,6 +11,7 @@ from __future__ import division
 import numpy as np
 import argparse
 import random
+from itertools import product
 
 ## PyTorch dependencies
 import torch
@@ -23,6 +24,7 @@ from Utils.Save_Results import save_results
 from Utils.Get_Optimizer import get_optimizer
 from Demo_Parameters import Parameters
 from Prepare_Data import Prepare_DataLoaders
+import pdb
 
 
 
@@ -61,7 +63,7 @@ def main(Params):
     print("Using", torch.cuda.device_count(), "GPUs!")
     
     print('Starting Experiments...')
-    for split in range(0, numRuns):
+    for split in range(0, numRuns-2):
         
         #Set random state for reproducibility
         torch.manual_seed(split)
@@ -109,6 +111,7 @@ def main(Params):
         model_ft = nn.DataParallel(model_ft)
         model_ft = model_ft.to(device)
         feature_extraction_layer = feature_extraction_layer.to(device)
+        
         # Print number of trainable parameters
         num_params = sum(p.numel() for p in model_ft.parameters() if p.requires_grad)
         print("Initializing Datasets and Dataloaders...")
@@ -172,7 +175,7 @@ def parse_args():
                         help='Save results of experiments (default: True)')
     parser.add_argument('--folder', type=str, default='Saved_Models/',
                         help='Location to save models')
-    parser.add_argument('--model', type=str, default='efficientnet',
+    parser.add_argument('--model', type=str, default='TDNN',
                         help='Select baseline model architecture')
     parser.add_argument('--histogram', default=False, action=argparse.BooleanOptionalAction,
                         help='Flag to use histogram model or baseline global average pooling (GAP), --no-histogram (GAP) or --histogram')
@@ -207,7 +210,32 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    use_cuda = args.use_cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-    params = Parameters(args)
-    main(params)
+    
+    #Create feature list for all 64 combinations
+    feature_list = ['Mel_Spectrogram', 'CQT', 'VQT', 'MFCC', 'STFT', 'GFCC']
+    
+    #Generate binary combinations
+    settings = list(product((True, False), repeat=len(feature_list)))
+    
+    #Remove last feature setting
+    settings.pop(-1)
+    
+    setting_count = 1
+    
+    for setting in settings:
+        
+        #Take feature setting and select features
+        temp_features = []
+        count = 0
+        for current_feature in setting:
+            if current_feature:
+                temp_features.append(feature_list[count])
+            count += 1
+
+        setattr(args, 'audio_feature', temp_features)
+        use_cuda = args.use_cuda and torch.cuda.is_available()
+        device = torch.device("cuda" if use_cuda else "cpu")
+        params = Parameters(args)
+        main(params)
+        print('Finished setting {} of {}'.format(setting_count,len(settings)))
+        setting_count += 1
