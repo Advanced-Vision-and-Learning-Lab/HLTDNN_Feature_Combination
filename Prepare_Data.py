@@ -16,6 +16,7 @@ from Datasets.DeepShipSegments import DeepShipSegments
 from Datasets.Get_Audio_Features import Get_Audio_Features
 from Datasets.Feature_Extraction_Layer import Feature_Extraction_Layer
 from Datasets.Get_preprocessed_data import process_data
+from Utils.Get_min_max import get_min_max_minibatch
 
 def Prepare_DataLoaders(Network_parameters):
     
@@ -37,6 +38,23 @@ def Prepare_DataLoaders(Network_parameters):
         test_dataset = DeepShipSegments(data_dir, partition='test', features=Network_parameters['feature'])        
     else:
         raise RuntimeError('Dataset not implemented') 
+
+
+
+
+
+
+    # #Compute min max norm of training data for normalization
+    # norm_function = get_min_max_minibatch(train_dataset, batch_size=128)
+    
+    # #Set normalization function for each dataset
+    # train_dataset.norm_function = norm_function
+    # val_dataset.norm_function = norm_function
+    # test_dataset.norm_function = norm_function
+
+
+
+
 
 
     #Create dictionary of datasets

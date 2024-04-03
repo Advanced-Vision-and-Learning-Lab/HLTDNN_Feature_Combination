@@ -63,7 +63,7 @@ def main(Params):
     print("Using", torch.cuda.device_count(), "GPUs!")
     
     print('Starting Experiments...')
-    for split in range(0, numRuns-2):
+    for split in range(0, numRuns):
         
         #Set random state for reproducibility
         torch.manual_seed(split)
@@ -104,6 +104,8 @@ def main(Params):
                                                 input_features = Params['feature'], 
                                                 dataset_dimension = dataset_dimension)
 
+        #model_lighntning = Get_Lightning_Model(model_ft,feature_extraction_layer)
+        
         # Send the model to GPU if available, use multiple if available
         if torch.cuda.device_count() > 1:
             print("Using", torch.cuda.device_count(), "GPUs!")
@@ -193,7 +195,7 @@ def parse_args():
                         help='input batch size for validation (default: 512)')
     parser.add_argument('--test_batch_size', type=int, default=256,
                         help='input batch size for testing (default: 256)')
-    parser.add_argument('--num_epochs', type=int, default=1,
+    parser.add_argument('--num_epochs', type=int, default=150,
                         help='Number of epochs to train each model for (default: 50)')
     parser.add_argument('--resize_size', type=int, default=256,
                         help='Resize the image before center crop. (default: 256)')
@@ -201,12 +203,16 @@ def parse_args():
                         help='learning rate (default: 0.001)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['CQT', 'VQT', 'MFCC', 'STFT'], # CQT', 'VQT', 'MFCC', 'STFT'
+    parser.add_argument('--audio_feature', nargs='+', default=['CQT', 'VQT', 'MFCC', 'STFT'],
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')
-    parser.add_argument('--patience', type = str, default = 15,
-                       help = 'patience')
+    parser.add_argument('--patience', type=int, default=15,
+                        help='Number of epochs to train each model for (default: 50)')
+    parser.add_argument('--start_index', type=int, default=2,
+                    help='Start index for settings')
+    parser.add_argument('--end_index', type=int, default=16,
+                    help='End index for settings')
     args = parser.parse_args()
     return args
 
@@ -223,6 +229,8 @@ if __name__ == "__main__":
     settings.pop(-1)
     
     setting_count = 1
+    
+    settings = settings[args.start_index:args.end_index]
     
     for setting in settings:
         
@@ -241,4 +249,4 @@ if __name__ == "__main__":
         main(params)
         print('Finished setting {} of {}'.format(setting_count,len(settings)))
         setting_count += 1
-        break
+
