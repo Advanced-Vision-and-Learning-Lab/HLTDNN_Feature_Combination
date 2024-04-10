@@ -93,34 +93,53 @@ def main(Params):
     from pytorch_grad_cam.utils.image import show_cam_on_image    
 
 
-    model_ft.load_state_dict(torch.load('Best_Weights.pt'))
-    
     dataloader = dataloaders_dict['train']
 
+    model_ft.load_state_dict(torch.load('Best_Weights.pt'))
 
     model_ft.eval()
     feature_extraction_layer.eval()
-       
-
-    # dataiter = iter(dataloader)
-    # images, labels = next(dataiter)[:2]
     
 
-    i=0
+
+
+    # Initialize counters
+    count_label_0 = 0  # Counter for samples with label 0
+    target_sample_number = 5  # The target instance of a sample with label 0
+    
+    # Found flag
+    found = False
+    
+    # Iterate over batches in the dataloader
     for batch in dataloader:
-        if i==3:
-            first_batch = batch
-            break
-        i+=1
+        signals, labels, _ = batch  # Assuming your DataLoader provides this structure
+        
+        signals = signals.to(device)
+        labels = labels.to(device)
     
+        with torch.no_grad():  # Ensure no gradients are computed in this block
+            for signal, label in zip(signals, labels):
+                if label.item() == 0:  # Check if the label is 0
+                    count_label_0 += 1  # Increment counter for label 0
+                    
+                    if count_label_0 == target_sample_number:  # Check if it's the 5th instance
+                        # Here you can process the signal as needed, e.g., feature extraction and prediction
+                        input_tensor = feature_extraction_layer(signal.unsqueeze(0))  # Shape: [1, 4, H, W]
+                        logits = model_ft(input_tensor)  # Forward pass
+                        probabilities = torch.softmax(logits, dim=1)  # Convert logits to probabilities
+                        _, predicted_class = torch.max(probabilities, 1)  # Determine predicted class
+                        predicted_class = predicted_class.cpu().item()  # Move prediction back to CPU if necessary
+                        
+                        # Now, you have found the specific sample you're interested in
+                        print('Found the 5th sample with label 0')
+                        sample_signal = signal
+                        sample_label = label
+                        found = True
+                        break  # Exit the loop over signals and labels
     
-    sample_signal = first_batch[0][2] 
-    sample_label = first_batch[1][2]   
-    
-    sample_signal = sample_signal.to(device)
-    sample_label = sample_label.to(device)
-    
- 
+            if found:
+                break  # Exit the loop over batches if the target sample is found
+
         
     
     input_tensor = feature_extraction_layer(sample_signal.unsqueeze(0))  # Shape: [1, 4, H, W]
@@ -167,91 +186,175 @@ def main(Params):
     grayscale_cam = cam(input_tensor=input_tensor, targets=targets, aug_smooth=True, eigen_smooth=True)
     grayscale_cam = grayscale_cam[0, :]  # Assuming a single image in the batch
           
-    #pdb.set_trace()
-    for i in range(4):
-        # Preparing the image for overlaying CAM
-        rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()  
-        rgb_img = np.transpose(rgb_img, (1, 2, 0))  # Change from CxHxW to HxWxC
-        rgb_img = (rgb_img - rgb_img.min()) / (rgb_img.max() - rgb_img.min())  # Normalize to [0, 1] for displaying
+
         
-        # Overlay CAM on the image
+    # for i in range(4):
+    #     rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()
+    #     rgb_img = np.transpose(rgb_img, (1, 2, 0))
+    #     # Normalize or scale rgb_img as necessary
+    
+    #     visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+    
+    #     fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+    #     original_image = axs[0].imshow(rgb_img, vmin=0, vmax=1)  # Assuming rgb_img is normalized to [0, 1]
+    #     axs[0].axis('off')
+    
+    #     # Assuming visualization is scaled to a specific range, for example [0, cam_max_value]
+    #     cam_max_value = np.max(grayscale_cam)  # Example way to set vmax for CAM
+    #     cam_image = axs[1].imshow(visualization, vmin=0, vmax=cam_max_value)
+    #     axs[1].axis('off')
+        
+    #     fig.colorbar(original_image, ax=axs[0], fraction=0.046, pad=0.04)
+    #     fig.colorbar(cam_image, ax=axs[1], fraction=0.046, pad=0.04)
+        
+    #     plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
+    #     plt.close(fig)
+
+
+    
+    #pdb.set_trace()
+    # for i in range(4):
+    #     # Preparing the image for overlaying CAM
+    #     rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()  
+    #     rgb_img = np.transpose(rgb_img, (1, 2, 0))  # Change from CxHxW to HxWxC
+    #     rgb_img = (rgb_img - rgb_img.min()) / (rgb_img.max() - rgb_img.min())  # Normalize to [0, 1] for displaying
+        
+    #     # Overlay CAM on the image
+    #     visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+        
+    #     # fig, axs = plt.subplots(1, 2, figsize=(8, 6))  
+    #     # axs[0].imshow(rgb_img)
+    #     # #axs[0].set_title('Original Spectrogram')
+    #     # axs[0].axis('off')  
+        
+    #     # axs[1].imshow(visualization)
+    #     # #axs[1].set_title('CAM Overlay')
+    #     # axs[1].axis('off')  
+        
+    #     # plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
+    #     # plt.close(fig)  
+
+    
+    #     fig, axs = plt.subplots(1, 2, figsize=(8, 4))  
+    #     original_image = axs[0].imshow(rgb_img)
+    #     axs[0].axis('off')  
+    
+    #     # Optionally add a colorbar for the original image
+    #     # This is more relevant if the original image has a meaningful color scale
+    #     fig.colorbar(original_image, ax=axs[0], fraction=0.046, pad=0.04)
+        
+    #     cam_image = axs[1].imshow(visualization)
+    #     axs[1].axis('off')  
+        
+    #     # Add a colorbar for the CAM overlay image
+    #     fig.colorbar(cam_image, ax=axs[1], fraction=0.046, pad=0.04)
+        
+    #     plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
+    #     plt.close(fig)
+
+    
+    # for i in range(4):
+    #     rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()
+    #     rgb_img = np.transpose(rgb_img, (1, 2, 0))
+    #     # Normalize rgb_img to [0, 1]
+    #     rgb_img = (rgb_img - rgb_img.min()) / (rgb_img.max() - rgb_img.min())
+    #     # Convert to np.float32
+    #     rgb_img = rgb_img.astype(np.float32)
+    
+
+
+    y_axis_labels = ['Frequency (Hz)', 'Coefficients', 'Frequency (Hz)', 'Coefficients']
+    x_axis_label = 'Time (s)'
+    
+    
+    for i in range(4):
+        original_img = input_tensor[0][i:i+1].detach().cpu().numpy()
+        original_img = np.transpose(original_img, (1, 2, 0))
+    
+        rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()
+        rgb_img = np.transpose(rgb_img, (1, 2, 0))
+        rgb_img = (rgb_img - rgb_img.min()) / (rgb_img.max() - rgb_img.min())
+        rgb_img = rgb_img.astype(np.float32)    
+    
+    
+        visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+    
+        fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+    
+        # Displaying the non-normalized original image
+        im = axs[0].imshow(original_img, aspect='auto')  # 'im' is defined here
+        axs[0].set_xlabel(x_axis_label, fontsize=14, fontweight='bold')
+        axs[0].set_ylabel(y_axis_labels[i], fontsize=14, fontweight='bold')
+        axs[0].axis('on')
+    
+        # Displaying the CAM overlay
+        cam_im = axs[1].imshow(visualization, aspect='auto')  # 'cam_im' is defined here
+        axs[1].set_xlabel(x_axis_label, fontsize=14, fontweight='bold')
+        axs[1].set_ylabel(y_axis_labels[i], fontsize=14, fontweight='bold')
+        axs[1].axis('on')
+    
+        # Add colorbars and adjust their appearance
+        cbar = fig.colorbar(im, ax=axs[0], fraction=0.046, pad=0.04)
+        cbar.ax.set_ylabel('Intensity', fontsize=12, fontweight='bold')
+        cbar_cam = fig.colorbar(cam_im, ax=axs[1], fraction=0.046, pad=0.04)
+        cbar_cam.ax.set_ylabel('Activation', fontsize=12, fontweight='bold')
+    
+        # Adjustments to make colorbars match the height of the plots might not be directly achievable
+        # through 'aspect'. Instead, ensuring the plots and colorbars align is often a matter of figure layout.
+        
+        plt.tight_layout()
+        plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
+        plt.close(fig)
+    
+
+
+        
+        
+
+
+    for i in range(4):
+        # Fetch the original image data
+        original_img = input_tensor[0][i:i+1].detach().cpu().numpy()
+        original_img = np.transpose(original_img, (1, 2, 0))
+        
+        # Normalize the input channel for CAM visualization
+        rgb_img = (original_img - original_img.min()) / (original_img.max() - original_img.min())
+        rgb_img = rgb_img.astype(np.float32)  
         visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
         
-        # plt.figure(figsize=(8, 6))
-        # plt.imshow(visualization)
-        # plt.axis('off')
-        # plt.savefig(f'CAM_Figures/CAM_visualization_{i}.png', dpi=500)  
-        # plt.close()
+        # Save original image
+        fig, ax = plt.subplots(figsize=(4, 4))
+        im = ax.imshow(original_img, aspect='auto')
+        ax.set_xlabel(x_axis_label, fontsize=14, fontweight='bold')
+        ax.set_ylabel(y_axis_labels[i], fontsize=14, fontweight='bold')
+        ax.axis('on')
+        cbar = fig.colorbar(im, ax=ax, fraction=0.12, pad=0.04)
+        cbar.ax.set_ylabel('Intensity', fontsize=12, fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(f'CAM_Figures/Original_ch{i}_class_{target_class_index}.png', dpi=150)
+        plt.close(fig)
         
-        fig, axs = plt.subplots(1, 2, figsize=(12, 6))  
-        axs[0].imshow(rgb_img)
-        axs[0].set_title('Original Spectrogram')
-        axs[0].axis('off')  
-        
-        axs[1].imshow(visualization)
-        axs[1].set_title('CAM Overlay')
-        axs[1].axis('off')  
-        
-        plt.savefig(f'CAM_Figures/combined_visualization_ch{i}_class{target_class_index}.png', dpi=500)
-        plt.close(fig)  
+        # Save CAM overlay image
+        fig, ax = plt.subplots(figsize=(4, 4))
+        cam_image = ax.imshow(visualization, aspect='auto')
+        ax.set_xlabel(x_axis_label, fontsize=14, fontweight='bold')
+        ax.set_ylabel(y_axis_labels[i], fontsize=14, fontweight='bold')
+        ax.axis('on')
+        vmin, vmax = grayscale_cam.min(), grayscale_cam.max()
+        norm = plt.Normalize(vmin=vmin, vmax=vmax)
+        sm = plt.cm.ScalarMappable(cmap="jet", norm=norm)
+        sm.set_array([])
+        cbar_cam = fig.colorbar(sm, ax=ax, fraction=0.12, pad=0.04)
+        cbar_cam.ax.set_ylabel('Activation', fontsize=12, fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(f'CAM_Figures/CAM_Overlay_ch{i}_class_{target_class_index}.png', dpi=150)
+        plt.close(fig)
 
-    # #FullGrad
-    # # Initialize EigenCAM with the selected target layer
-    # cam = FullGrad(model=model_ft.module, target_layers=target_layers)
+    
 
-    # # Define the target for which you want to generate the CAM
-    # targets = [ClassifierOutputTarget(target_class_index)]    
-    # grayscale_cam = cam(input_tensor=input_tensor, targets=targets, aug_smooth=True, eigen_smooth=True)[0, :] 
-    
-    # # Normalize and convert CAM to correct format
-    # grayscale_cam = np.maximum(grayscale_cam, 0)  
-    # grayscale_cam = grayscale_cam - np.min(grayscale_cam)
-    # grayscale_cam = grayscale_cam / np.max(grayscale_cam)
-    # grayscale_cam = np.float32(grayscale_cam)
-    
-    # num_channels = input_tensor.shape[1]  # Number of channels in the input_tensor
-    
-    # for channel_index in range(num_channels):
-    #     # Extract and normalize the channel image
-    #     channel_img = input_tensor[0, channel_index].cpu().detach().numpy()
-    #     channel_img_normalized = (channel_img - np.min(channel_img)) / (np.max(channel_img) - np.min(channel_img))
         
-    #     # Convert to RGB format by stacking
-    #     channel_img_rgb = np.stack((channel_img_normalized,) * 3, axis=-1)
-        
-    #     # Generate CAM visualization
-    #     visualization = show_cam_on_image(channel_img_rgb, grayscale_cam, use_rgb=True)
-        
-    #     # Combine the original spectrogram channel and the CAM visualization side by side
-    #     combined_image = np.hstack((channel_img_rgb, visualization))
-        
-    #     # Convert combined image to uint8
-    #     combined_image_uint8 = np.uint8(255 * combined_image)
-    
-    #     plt.figure(figsize=(8, 6))  
-    #     plt.imshow(combined_image_uint8, aspect='auto', origin='lower', cmap='viridis')  
-    #     plt.colorbar(label='Magnitude')
-    #     plt.title(f'Channel {channel_index}: Original Spectrogram and CAM Overlay')
-    #     plt.axis('off') 
-    #     plt.savefig(f'CAM_Figures/{channel_index}_virdis', dpi=500)
-            
 
-    #     plt.figure(figsize=(12, 6)) 
-    #     plt.subplot(1, 2, 1)  
-    #     plt.imshow(channel_img_normalized, aspect='auto', origin='lower', cmap='viridis')
-    #     plt.colorbar(label='Magnitude')
-    #     plt.title(f'Channel {channel_index} Spectrogram')
-    #     plt.axis('off')  
-    #     plt.subplot(1, 2, 2) 
-    #     plt.imshow(visualization, aspect='auto', origin='lower')
-    #     plt.title(f'Channel {channel_index} CAM Overlay')
-    #     plt.axis('off')  # Hide axes for better visualization
-    #     plt.savefig(f'CAM_Figures/Channel_{channel_index}__virdis_combined.png', dpi=500)
-    #     plt.close()
-  
     
-  
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run histogram experiments for dataset')
@@ -277,7 +380,7 @@ def parse_args():
                         help='input batch size for validation (default: 512)')
     parser.add_argument('--test_batch_size', type=int, default=256,
                         help='input batch size for testing (default: 256)')
-    parser.add_argument('--num_epochs', type=int, default=150,
+    parser.add_argument('--num_epochs', type=int, default=1,
                         help='Number of epochs to train each model for (default: 50)')
     parser.add_argument('--resize_size', type=int, default=256,
                         help='Resize the image before center crop. (default: 256)')

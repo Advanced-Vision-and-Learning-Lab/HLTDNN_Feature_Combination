@@ -78,6 +78,9 @@ class Feature_Extraction_Layer(nn.Module):
 
 
     def forward(self, x):
+        
+        #pdb.set_trace()
+        
         transformed_features = []
         for feature in self.input_features:
             feature_tensor = self.features[feature](x)
