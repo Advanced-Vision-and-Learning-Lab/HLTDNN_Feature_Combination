@@ -215,10 +215,13 @@ def main(Params):
             output.write(str(MCC[split]))
         directory = os.path.dirname(os.path.dirname(sub_dir)) + '/'
 
-
-
-        data_part = 'train' # 'val', 'test'
-        generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, data_part)
+        # choose the label for the ship type (Cargo=0)
+        class_label=0
+        # choose a sample index from the class
+        target_sample_number=5
+        # chosoe the partition
+        partition = 'train' # 'val', 'test'
+        generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, partition, class_label, target_sample_number)
     
     
     

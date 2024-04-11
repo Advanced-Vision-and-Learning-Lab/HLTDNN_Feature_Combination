@@ -17,24 +17,17 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 import re
 import os
 
-def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, data_part):
+def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, partition, class_label = 0, target_sample_number=5):
 
-    print('Loading model...')
-    model.load_state_dict(torch.load(sub_dir + 'Best_Weights.pt', map_location=device_loc))
-    model = model.to(device)
-    feature_extraction_layer = feature_extraction_layer.to(device)
-
-    dataloader = dataloaders_dict[data_part]
+    dataloader = dataloaders_dict[partition]
     
     model.eval()
     feature_extraction_layer.eval()
-    
 
     count_label_0 = 0
-    target_sample_number = 5
-    class_label = 0
     found = False
 
+    #Iterate through the bathces to find the specified sample
     for batch in dataloader:
         signals, labels, _ = batch
         signals = signals.to(device)
@@ -54,6 +47,7 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
             if found:
                 break
 
+    # convert the sample to the spectrogram
     input_tensor = feature_extraction_layer(sample_signal.unsqueeze(0))
     
     with torch.no_grad():
@@ -61,7 +55,7 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
         probabilities = torch.softmax(outputs, dim=1)
         _, predicted_class_index = torch.max(probabilities, dim=1)
         target_class_index = predicted_class_index.item()
-    print(f"Target Class Index: {target_class_index}")
+    print(f"Predicted Target Class Index: {target_class_index}")
     
     
     predicted_class = predicted_class_index.cpu().numpy()[0]
@@ -71,14 +65,13 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
     else:
         print("The sample was misclassified by the model.")
         
-    
+    # determine the target layers and initialize the CAM
     target_layers = [model.module.backbone.conv5, model.module.histogram_layer.bin_widths_conv]
     targets = [ClassifierOutputTarget(target_class_index)]
     cam = FullGrad(model=model.module, target_layers=target_layers)
     grayscale_cam = cam(input_tensor=input_tensor, targets=targets, aug_smooth=True, eigen_smooth=True)
     grayscale_cam = grayscale_cam[0, :]
     
-
 
     feature_y_axis_labels = {
         'Mel_Spectrogram': 'Frequency (Hz)',
@@ -96,9 +89,8 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
     base_path = f'CAM_Figures/{feature_dir}/{run_number}/'
     os.makedirs(base_path, exist_ok=True) 
 
-
+    # Plot and save the figures for both the original spectrogram and the corresponding CAM overlay
     for i, feature in enumerate(Params['feature']):
-        # Check if the feature is in the feature_y_axis_labels dictionary
         if feature in feature_y_axis_labels:
             # Fetch the original image data
             original_img = input_tensor[0][i:i+1].detach().cpu().numpy()

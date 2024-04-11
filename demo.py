@@ -222,8 +222,7 @@ if __name__ == "__main__":
     #Remove last feature setting
     settings.pop(-1)
     
-    setting_count = 1
-    
+    setting_count = 1    
     settings = settings[47:49] 
     
     for setting in settings:
