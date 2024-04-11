@@ -35,6 +35,10 @@ import pdb
 from itertools import product
 plt.ioff()
 
+
+from cam_function import generate_CAM
+
+
 def main(Params):
 
     # Location of experimental results
@@ -72,7 +76,11 @@ def main(Params):
     accuracy = np.zeros(NumRuns)
     MCC = np.zeros(NumRuns)
     
-    for split in range(0, NumRuns-2):
+    
+    #pdb.set_trace()
+    
+    
+    for split in range(0, NumRuns):
         
        
         #Find directory of results
@@ -200,6 +208,10 @@ def main(Params):
             output.write(str(MCC[split]))
         directory = os.path.dirname(os.path.dirname(sub_dir)) + '/'
     
+    
+        generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params)
+    
+    
         print('**********Run ' + str(split + 1) + ' Finished**********')
     
     directory = os.path.dirname(os.path.dirname(sub_dir)) + '/'
@@ -234,6 +246,8 @@ def main(Params):
     np.savetxt((directory + 'test_List_log_FDR_scores.txt'), log_FDR_scores, fmt='%.2f')
     plt.close("all")
 
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Run histogram experiments for dataset')
     parser.add_argument('--save_results', default=True, action=argparse.BooleanOptionalAction,
@@ -242,7 +256,7 @@ def parse_args():
                         help='Location to save models')
     parser.add_argument('--model', type=str, default='TDNN',
                         help='Select baseline model architecture')
-    parser.add_argument('--histogram', default=False, action=argparse.BooleanOptionalAction,
+    parser.add_argument('--histogram', default=True, action=argparse.BooleanOptionalAction,
                         help='Flag to use histogram model or baseline global average pooling (GAP), --no-histogram (GAP) or --histogram')
     parser.add_argument('--data_selection', type=int, default=0,
                         help='Dataset selection: See Demo_Parameters for full list of datasets')
@@ -268,7 +282,7 @@ def parse_args():
                         help='sigma for toy dataset (default: 0.1)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['CQT', 'VQT', 'MFCC', 'STFT'], # CQT', 'VQT', 'MFCC', 'STFT'
+    parser.add_argument('--audio_feature', nargs='+', default=['VQT', 'MFCC', 'STFT', 'GFCC'], # CQT', 'VQT', 'MFCC', 'STFT'
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')
@@ -288,6 +302,10 @@ if __name__ == "__main__":
     
     #Generate binary combinations
     settings = list(product((True, False), repeat=len(feature_list)))
+    
+    
+    settings = settings[48:50]
+    #settings = settings[59:61]
     
     #Remove last feature setting
     settings.pop(-1)

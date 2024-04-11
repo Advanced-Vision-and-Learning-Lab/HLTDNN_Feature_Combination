@@ -101,7 +101,7 @@ def Parameters(args):
     #Set number of workers, i.e., how many subprocesses to use for data loading.
     #Usually set to 0 or 1. Can set to more if multiple machines are used.
     #Number of workers for experiments for two GPUs was three
-    num_workers = 20
+    num_workers = 16
     
     #Output feature map size after histogram layer
     feat_map_size = 4

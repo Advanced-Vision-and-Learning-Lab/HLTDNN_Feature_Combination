@@ -87,38 +87,13 @@ class DeepShipSegments(Dataset):
     def __getitem__(self, idx):
         file_path, label = self.segment_lists[self.partition][idx]
         
-        #pdb.set_trace()
-        
-        # sr, signal = wavfile.read(file_path, mmap=False)
-        # signal = signal.astype(np.float32)
-        
-        
-        # Convert the NumPy array to a PyTorch tensor
-        #signal = torch.from_numpy(signal)
-        
-        # signal = torch.tensor(signal)
-        # signal = signal.unsqueeze(0)
-        
-        
-       
-        # if self.norm_function is not None:
-        #     signal = self.norm_function(signal)
-        #     signal = torch.tensor(signal)
-        
-        # label = torch.tensor(label)
-        # if self.target_transform:
-        #     label = self.target_transform(label)
-        
-        
-        
-    
+
         signal, sr = torchaudio.load(file_path, normalize = True)
         
         
         label = torch.tensor(label)
         if self.target_transform:
             label = self.target_transform(label)
-
 
 
         return signal, label, idx

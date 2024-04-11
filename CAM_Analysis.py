@@ -87,12 +87,17 @@ def main(Params):
     print("Initializing Datasets and Dataloaders...")
     print("Number of params: ", num_params)
       
+    
+    
+    
+    # CAM code
 
     from pytorch_grad_cam import GradCAM, HiResCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
     from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
     from pytorch_grad_cam.utils.image import show_cam_on_image    
 
-
+    print(Params['feature'])
+    
     dataloader = dataloaders_dict['train']
 
     model_ft.load_state_dict(torch.load('Best_Weights.pt'))
@@ -100,9 +105,6 @@ def main(Params):
     model_ft.eval()
     feature_extraction_layer.eval()
     
-
-
-
     # Initialize counters
     count_label_0 = 0  # Counter for samples with label 0
     target_sample_number = 5  # The target instance of a sample with label 0
@@ -141,7 +143,6 @@ def main(Params):
                 break  # Exit the loop over batches if the target sample is found
 
         
-    
     input_tensor = feature_extraction_layer(sample_signal.unsqueeze(0))  # Shape: [1, 4, H, W]
     # Forward pass 
     logits = model_ft(input_tensor)  
@@ -158,7 +159,6 @@ def main(Params):
     else:
         print("The sample was misclassified by the model.")
         
-    
     with torch.no_grad():
         outputs = model_ft(input_tensor)
         # Assuming outputs are logits; apply softmax to convert to probabilities
@@ -166,15 +166,9 @@ def main(Params):
         # Get the predicted class index with the highest probability
         _, predicted_class_index = torch.max(probabilities, dim=1)
         target_class_index = predicted_class_index.item()
-
     print(f"Target Class Index: {target_class_index}")
-
     
     target_layers = [model_ft.module.backbone.conv5, model_ft.module.histogram_layer.bin_widths_conv]
-    #target_layers = [model_ft.module.histogram_layer.bin_centers_conv] 
-    #target_layers = [model_ft.module.backbone.conv5] 
-
-    # Note: input_tensor can be a batch tensor with several images!
 
     # Define the target for which you want to generate the CAM
     targets = [ClassifierOutputTarget(target_class_index)]
@@ -185,132 +179,11 @@ def main(Params):
     # Generate the CAM for the given input
     grayscale_cam = cam(input_tensor=input_tensor, targets=targets, aug_smooth=True, eigen_smooth=True)
     grayscale_cam = grayscale_cam[0, :]  # Assuming a single image in the batch
-          
-
-        
-    # for i in range(4):
-    #     rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()
-    #     rgb_img = np.transpose(rgb_img, (1, 2, 0))
-    #     # Normalize or scale rgb_img as necessary
     
-    #     visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
-    
-    #     fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-    #     original_image = axs[0].imshow(rgb_img, vmin=0, vmax=1)  # Assuming rgb_img is normalized to [0, 1]
-    #     axs[0].axis('off')
-    
-    #     # Assuming visualization is scaled to a specific range, for example [0, cam_max_value]
-    #     cam_max_value = np.max(grayscale_cam)  # Example way to set vmax for CAM
-    #     cam_image = axs[1].imshow(visualization, vmin=0, vmax=cam_max_value)
-    #     axs[1].axis('off')
-        
-    #     fig.colorbar(original_image, ax=axs[0], fraction=0.046, pad=0.04)
-    #     fig.colorbar(cam_image, ax=axs[1], fraction=0.046, pad=0.04)
-        
-    #     plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
-    #     plt.close(fig)
-
-
-    
-    #pdb.set_trace()
-    # for i in range(4):
-    #     # Preparing the image for overlaying CAM
-    #     rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()  
-    #     rgb_img = np.transpose(rgb_img, (1, 2, 0))  # Change from CxHxW to HxWxC
-    #     rgb_img = (rgb_img - rgb_img.min()) / (rgb_img.max() - rgb_img.min())  # Normalize to [0, 1] for displaying
-        
-    #     # Overlay CAM on the image
-    #     visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
-        
-    #     # fig, axs = plt.subplots(1, 2, figsize=(8, 6))  
-    #     # axs[0].imshow(rgb_img)
-    #     # #axs[0].set_title('Original Spectrogram')
-    #     # axs[0].axis('off')  
-        
-    #     # axs[1].imshow(visualization)
-    #     # #axs[1].set_title('CAM Overlay')
-    #     # axs[1].axis('off')  
-        
-    #     # plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
-    #     # plt.close(fig)  
-
-    
-    #     fig, axs = plt.subplots(1, 2, figsize=(8, 4))  
-    #     original_image = axs[0].imshow(rgb_img)
-    #     axs[0].axis('off')  
-    
-    #     # Optionally add a colorbar for the original image
-    #     # This is more relevant if the original image has a meaningful color scale
-    #     fig.colorbar(original_image, ax=axs[0], fraction=0.046, pad=0.04)
-        
-    #     cam_image = axs[1].imshow(visualization)
-    #     axs[1].axis('off')  
-        
-    #     # Add a colorbar for the CAM overlay image
-    #     fig.colorbar(cam_image, ax=axs[1], fraction=0.046, pad=0.04)
-        
-    #     plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
-    #     plt.close(fig)
-
-    
-    # for i in range(4):
-    #     rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()
-    #     rgb_img = np.transpose(rgb_img, (1, 2, 0))
-    #     # Normalize rgb_img to [0, 1]
-    #     rgb_img = (rgb_img - rgb_img.min()) / (rgb_img.max() - rgb_img.min())
-    #     # Convert to np.float32
-    #     rgb_img = rgb_img.astype(np.float32)
-    
-
 
     y_axis_labels = ['Frequency (Hz)', 'Coefficients', 'Frequency (Hz)', 'Coefficients']
     x_axis_label = 'Time (s)'
     
-    
-    for i in range(4):
-        original_img = input_tensor[0][i:i+1].detach().cpu().numpy()
-        original_img = np.transpose(original_img, (1, 2, 0))
-    
-        rgb_img = input_tensor[0][i:i+1].detach().cpu().numpy()
-        rgb_img = np.transpose(rgb_img, (1, 2, 0))
-        rgb_img = (rgb_img - rgb_img.min()) / (rgb_img.max() - rgb_img.min())
-        rgb_img = rgb_img.astype(np.float32)    
-    
-    
-        visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
-    
-        fig, axs = plt.subplots(1, 2, figsize=(8, 4))
-    
-        # Displaying the non-normalized original image
-        im = axs[0].imshow(original_img, aspect='auto')  # 'im' is defined here
-        axs[0].set_xlabel(x_axis_label, fontsize=14, fontweight='bold')
-        axs[0].set_ylabel(y_axis_labels[i], fontsize=14, fontweight='bold')
-        axs[0].axis('on')
-    
-        # Displaying the CAM overlay
-        cam_im = axs[1].imshow(visualization, aspect='auto')  # 'cam_im' is defined here
-        axs[1].set_xlabel(x_axis_label, fontsize=14, fontweight='bold')
-        axs[1].set_ylabel(y_axis_labels[i], fontsize=14, fontweight='bold')
-        axs[1].axis('on')
-    
-        # Add colorbars and adjust their appearance
-        cbar = fig.colorbar(im, ax=axs[0], fraction=0.046, pad=0.04)
-        cbar.ax.set_ylabel('Intensity', fontsize=12, fontweight='bold')
-        cbar_cam = fig.colorbar(cam_im, ax=axs[1], fraction=0.046, pad=0.04)
-        cbar_cam.ax.set_ylabel('Activation', fontsize=12, fontweight='bold')
-    
-        # Adjustments to make colorbars match the height of the plots might not be directly achievable
-        # through 'aspect'. Instead, ensuring the plots and colorbars align is often a matter of figure layout.
-        
-        plt.tight_layout()
-        plt.savefig(f'CAM_Figures/BEST_COMBO_ch{i}_class_{target_class_index}.png', dpi=150)
-        plt.close(fig)
-    
-
-
-        
-        
-
 
     for i in range(4):
         # Fetch the original image data
