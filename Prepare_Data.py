@@ -46,7 +46,7 @@ def Prepare_DataLoaders(Network_parameters):
     # Create training and test dataloaders
     dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x],
                                                        batch_size=Network_parameters['batch_size'][x],
-                                                       shuffle=False,
+                                                       shuffle=True,
                                                        num_workers=Network_parameters['num_workers'],
                                                        pin_memory=Network_parameters['pin_memory'])
                                                        for x in ['train', 'val','test']}

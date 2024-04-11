@@ -6,7 +6,6 @@ Created on Thu Apr 11 11:15:47 2024
 @author: amir.m
 """
 
-
 # cam_function.py
 
 import torch
@@ -16,15 +15,16 @@ from pytorch_grad_cam import FullGrad
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 import re
+import os
 
-def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params):
+def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, data_part):
 
     print('Loading model...')
     model.load_state_dict(torch.load(sub_dir + 'Best_Weights.pt', map_location=device_loc))
     model = model.to(device)
     feature_extraction_layer = feature_extraction_layer.to(device)
 
-    dataloader = dataloaders_dict['train']
+    dataloader = dataloaders_dict[data_part]
     
     model.eval()
     feature_extraction_layer.eval()
@@ -32,6 +32,7 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
 
     count_label_0 = 0
     target_sample_number = 5
+    class_label = 0
     found = False
 
     for batch in dataloader:
@@ -41,11 +42,11 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
 
         with torch.no_grad():
             for signal, label in zip(signals, labels):
-                if label.item() == 0:
+                if label.item() == class_label:
                     count_label_0 += 1
                     
                     if count_label_0 == target_sample_number:
-                        print('Found the 5th sample with label 0')
+                        print(f'Found sample {target_sample_number} with label {class_label}')
                         sample_signal = signal
                         sample_label = label
                         found = True
@@ -90,9 +91,10 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
     
     x_axis_label = 'Time (s)'
     
-
-    match = re.search(r'Run_(\d+)', sub_dir)
-    run_number = match.group(1) if match else None
+    run_number = 'Run_' + re.search(r'Run_(\d+)', sub_dir).group(1) if re.search(r'Run_(\d+)', sub_dir) else 'Unknown_Run'
+    feature_dir = '_'.join(Params['feature'])  
+    base_path = f'CAM_Figures/{feature_dir}/{run_number}/'
+    os.makedirs(base_path, exist_ok=True) 
 
 
     for i, feature in enumerate(Params['feature']):
@@ -116,7 +118,7 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
             cbar = fig.colorbar(im, ax=ax, fraction=0.12, pad=0.04)
             cbar.ax.set_ylabel('Intensity', fontsize=12, fontweight='bold')
             plt.tight_layout()
-            plt.savefig(f'CAM_Figures/Original_{feature}_pclass_{target_class_index}_aclass_{actual_class}_run{run_number}.png', dpi=150)
+            plt.savefig(f'{base_path}Original_{feature}_pclass_{target_class_index}_aclass_{actual_class}.png', dpi=150)
             plt.close(fig)
             
             # Save CAM overlay image
@@ -132,6 +134,6 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
             cbar_cam = fig.colorbar(sm, ax=ax, fraction=0.12, pad=0.04)
             cbar_cam.ax.set_ylabel('Activation', fontsize=12, fontweight='bold')
             plt.tight_layout()
-            plt.savefig(f'CAM_Figures/CAM_Overlay_{feature}_pclass_{target_class_index}_aclass_{actual_class}.png', dpi=150)
+            plt.savefig(f'{base_path}CAM_{feature}_pclass_{target_class_index}_aclass_{actual_class}.png', dpi=150)
             plt.close(fig)
         

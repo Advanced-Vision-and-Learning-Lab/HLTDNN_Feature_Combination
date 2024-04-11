@@ -35,6 +35,7 @@ import pdb
 from itertools import product
 plt.ioff()
 
+import random
 
 from cam_function import generate_CAM
 
@@ -82,7 +83,13 @@ def main(Params):
     
     for split in range(0, NumRuns):
         
-       
+        #Set random state for reproducibility
+        torch.manual_seed(split)
+        np.random.seed(split)
+        random.seed(split)
+        torch.cuda.manual_seed(split)
+        torch.cuda.manual_seed_all(split)
+        
         #Find directory of results
         sub_dir = get_file_location(Params,split)
         
@@ -207,9 +214,12 @@ def main(Params):
         with open((sub_dir + 'MCC.txt'), "w") as output:
             output.write(str(MCC[split]))
         directory = os.path.dirname(os.path.dirname(sub_dir)) + '/'
+
+
+
+        data_part = 'train' # 'val', 'test'
+        generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, data_part)
     
-    
-        generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params)
     
     
         print('**********Run ' + str(split + 1) + ' Finished**********')

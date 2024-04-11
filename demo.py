@@ -63,7 +63,7 @@ def main(Params):
     print("Using", torch.cuda.device_count(), "GPUs!")
     
     print('Starting Experiments...')
-    for split in range(0, numRuns-2):
+    for split in range(0, numRuns):
         
         #Set random state for reproducibility
         torch.manual_seed(split)
@@ -224,9 +224,7 @@ if __name__ == "__main__":
     
     setting_count = 1
     
-    
-    #settings = settings[48:50] 
-    
+    settings = settings[47:49] 
     
     for setting in settings:
         
