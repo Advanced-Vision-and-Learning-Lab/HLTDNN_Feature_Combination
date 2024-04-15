@@ -36,9 +36,7 @@ from itertools import product
 plt.ioff()
 
 import random
-
-from cam_function import generate_CAM
-
+from Utils.cam_function import generate_CAM
 
 def main(Params):
 
@@ -76,9 +74,6 @@ def main(Params):
     log_FDR_scores = np.zeros((len(class_names), NumRuns))
     accuracy = np.zeros(NumRuns)
     MCC = np.zeros(NumRuns)
-    
-    
-    #pdb.set_trace()
     
     
     for split in range(0, NumRuns):
@@ -224,7 +219,6 @@ def main(Params):
         generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, partition, class_label, target_sample_number)
     
     
-    
         print('**********Run ' + str(split + 1) + ' Finished**********')
     
     directory = os.path.dirname(os.path.dirname(sub_dir)) + '/'
@@ -295,7 +289,7 @@ def parse_args():
                         help='sigma for toy dataset (default: 0.1)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['VQT', 'MFCC', 'STFT', 'GFCC'], # CQT', 'VQT', 'MFCC', 'STFT'
+    parser.add_argument('--audio_feature', nargs='+', default=['VQT', 'MFCC', 'STFT', 'GFCC'], 
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')
@@ -306,8 +300,6 @@ def parse_args():
 
 if __name__ == "__main__":
     
-    
-    
     args = parse_args()
     
     #Create feature list for all 64 combinations
@@ -315,10 +307,7 @@ if __name__ == "__main__":
     
     #Generate binary combinations
     settings = list(product((True, False), repeat=len(feature_list)))
-    
-    
-    settings = settings[48:50]
-    #settings = settings[59:61]
+    #settings = settings[48:50]
     
     #Remove last feature setting
     settings.pop(-1)

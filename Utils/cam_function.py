@@ -6,8 +6,6 @@ Created on Thu Apr 11 11:15:47 2024
 @author: amir.m
 """
 
-# cam_function.py
-
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -86,7 +84,7 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
     
     run_number = 'Run_' + re.search(r'Run_(\d+)', sub_dir).group(1) if re.search(r'Run_(\d+)', sub_dir) else 'Unknown_Run'
     feature_dir = '_'.join(Params['feature'])  
-    base_path = f'CAM_Figures/{feature_dir}/{run_number}/'
+    base_path = f'../CAM_Figures/{feature_dir}/{run_number}/'
     os.makedirs(base_path, exist_ok=True) 
 
     # Plot and save the figures for both the original spectrogram and the corresponding CAM overlay

@@ -201,7 +201,7 @@ def parse_args():
                         help='learning rate (default: 0.001)')
     parser.add_argument('--use-cuda', default=True, action=argparse.BooleanOptionalAction,
                         help='enables CUDA training')
-    parser.add_argument('--audio_feature', nargs='+', default=['VQT', 'MFCC', 'STFT', 'GFCC'], # CQT', 'VQT', 'MFCC', 'STFT'
+    parser.add_argument('--audio_feature', nargs='+', default=['VQT', 'MFCC', 'STFT', 'GFCC'], # CQT', 'Mel_Spectrogram'
                         help='Audio feature for extraction')
     parser.add_argument('--optimizer', type = str, default = 'Adagrad',
                        help = 'Select optimizer')
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     settings.pop(-1)
     
     setting_count = 1    
-    settings = settings[47:49] 
+    #settings = settings[47:49] 
     
     for setting in settings:
         
@@ -242,4 +242,3 @@ if __name__ == "__main__":
         main(params)
         print('Finished setting {} of {}'.format(setting_count,len(settings)))
         setting_count += 1
-        break
