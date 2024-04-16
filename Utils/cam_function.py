@@ -15,7 +15,7 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 import re
 import os
 
-def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, partition, class_label = 0, target_sample_number=5):
+def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, directory, Params, partition, class_label = 0, target_sample_number=5):
 
     dataloader = dataloaders_dict[partition]
     
@@ -37,7 +37,7 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
                     count_label_0 += 1
                     
                     if count_label_0 == target_sample_number:
-                        print(f'Found sample {target_sample_number} with label {class_label}')
+                        print(f'CAM: Found sample {target_sample_number} with label {class_label}')
                         sample_signal = signal
                         sample_label = label
                         found = True
@@ -53,15 +53,15 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
         probabilities = torch.softmax(outputs, dim=1)
         _, predicted_class_index = torch.max(probabilities, dim=1)
         target_class_index = predicted_class_index.item()
-    print(f"Predicted Target Class Index: {target_class_index}")
+    print(f"CAM: Predicted Target Class Index: {target_class_index}")
     
     
     predicted_class = predicted_class_index.cpu().numpy()[0]
     actual_class = sample_label.cpu().item()  
     if predicted_class == actual_class:
-        print("The sample was correctly classified by the model.")
+        print("CAM: The sample was correctly classified by the model.")
     else:
-        print("The sample was misclassified by the model.")
+        print("CAM: The sample was misclassified by the model.")
         
     # determine the target layers and initialize the CAM
     target_layers = [model.module.backbone.conv5, model.module.histogram_layer.bin_widths_conv]
@@ -84,7 +84,7 @@ def generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_
     
     run_number = 'Run_' + re.search(r'Run_(\d+)', sub_dir).group(1) if re.search(r'Run_(\d+)', sub_dir) else 'Unknown_Run'
     feature_dir = '_'.join(Params['feature'])  
-    base_path = f'../CAM_Figures/{feature_dir}/{run_number}/'
+    base_path = directory + f'/CAM_Figures/{feature_dir}/{run_number}/'
     os.makedirs(base_path, exist_ok=True) 
 
     # Plot and save the figures for both the original spectrogram and the corresponding CAM overlay

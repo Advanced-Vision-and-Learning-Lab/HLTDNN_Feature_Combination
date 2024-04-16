@@ -115,6 +115,7 @@ def main(Params):
         # Print number of trainable parameters
         num_params = sum(p.numel() for p in model_ft.parameters() if p.requires_grad)
         print("Initializing Datasets and Dataloaders...")
+        print("Number of parameters: {}".format(num_params))
 
         # Save the initial values for bins and widths of histogram layer
         # Set optimizer for model
@@ -223,7 +224,7 @@ if __name__ == "__main__":
     settings.pop(-1)
     
     setting_count = 1    
-    #settings = settings[47:49] 
+    settings = settings[59:61] 
     
     for setting in settings:
         

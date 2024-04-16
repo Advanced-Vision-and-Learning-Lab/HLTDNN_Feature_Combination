@@ -216,7 +216,7 @@ def main(Params):
         target_sample_number=5
         # chosoe the partition
         partition = 'train' # 'val', 'test'
-        generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, device_loc, Params, partition, class_label, target_sample_number)
+        generate_CAM(model, feature_extraction_layer, dataloaders_dict, device, sub_dir, directory, Params, partition, class_label, target_sample_number)
     
     
         print('**********Run ' + str(split + 1) + ' Finished**********')
@@ -308,6 +308,7 @@ if __name__ == "__main__":
     #Generate binary combinations
     settings = list(product((True, False), repeat=len(feature_list)))
     #settings = settings[48:50]
+    settings = settings[59:61]
     
     #Remove last feature setting
     settings.pop(-1)

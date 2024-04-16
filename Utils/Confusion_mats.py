@@ -123,7 +123,8 @@ def plot_avg_confusion_matrix(cm, classes,
             
         ax.text(j, i, s,
                 horizontalalignment="center",
-                color="white" if cm[i, j] > thresh else "black",fontsize=fontsize-4)
+                verticalalignment="center",  
+                color="white" if cm[i, j] > thresh else "black",fontsize=fontsize+1)
         
     ax.set(xticks=np.arange(len(classes)),
                    yticks=np.arange(len(classes)),
