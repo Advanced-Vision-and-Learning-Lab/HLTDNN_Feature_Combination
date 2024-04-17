@@ -308,7 +308,7 @@ if __name__ == "__main__":
     #Generate binary combinations
     settings = list(product((True, False), repeat=len(feature_list)))
     #settings = settings[48:50]
-    settings = settings[59:61]
+    #settings = settings[59:61]
     
     #Remove last feature setting
     settings.pop(-1)

@@ -224,7 +224,7 @@ if __name__ == "__main__":
     settings.pop(-1)
     
     setting_count = 1    
-    settings = settings[59:61] 
+    #settings = settings[59:61] 
     
     for setting in settings:
         

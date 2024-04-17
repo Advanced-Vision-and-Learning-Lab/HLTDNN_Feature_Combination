@@ -1,31 +1,23 @@
 # Histogram Layer Time Delay Neural Networks:
 <p align="center">
-  <img src="Figures/Workflow.png" alt="Workflow Diagram">
+  <img src="Figures/PicFull.png" alt="Workflow Diagram">
 </p>
 
 
 **Histogram Layer Time Delay Neural Networks For Passive Sonar Classification**
 
-Jarin Ritu, Ethan Barnes, Riley Martell, Alexandra Van Dine and Joshua Peeples
+Amirmohammad Mohammadi, Irene Masabarakiza, Ethan Barnes, Davelle Carreiro, Alexandra Van Dine and Joshua Peeples
 
-Note: If this code is used, cite it: Jarin Ritu, Ethan Barnes, Riley Martell, Alexandra Van Dine and Joshua Peeples. (2023, July 25) Peeples-Lab/HLTDNN: Initial Release (Version v1.0). 
-[`Zendo`](https://doi.org/10.5281/zenodo.8184517).https://zenodo.org/record/8184517
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8184517.svg)](https://doi.org/10.5281/zenodo.8184517)
+Note: If this code is used, cite it: Amirmohammad Mohammadi, Irene Masabarakiza, Ethan Barnes, Davelle Carreiro, Alexandra Van Dine and Joshua Peeples. (2024, April 25) Initial Release (Version v1.0). 
 
-`Accepted to IEEE WASPAA`(Link to conference proceedings TBD)
+`Accepted to IEEE (LINK)
 
-[`arXiv`](https://arxiv.org/abs/2307.13788)
-
-[`BibTeX`](#CitingHist)
-
-
-
-In this repository, we provide the paper and code for "Histogram Layer Time Delay Neural Network For Passive Sonar Classification."
+In this repository, we provide the paper and code for "Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks"
 
 ## Installation Prerequisites
 
 
-The [`requirements.txt`](requirements.txt) file includes all the necessary packages, and the packages will be installed using:
+The [`requirements.txt`](requirements.txt) file includes the necessary packages, and the packages will be installed using:
 
    ```pip install -r requirements.txt```
 
@@ -75,7 +67,8 @@ https://github.com/Peeples-Lab/HLTDNN
     └── Datasets                
         ├── Get_Preprocessed_Data.py      // Resample the audio data and generate segments for the dataset.
         └── DeepShipSegments.py           // Create a custom dataset for DeepShip.
-        └── Get_Audio_Features.py         // Extract and transform different features from the audio files.
+        └── Feature_Extraction_Layer.py   // Extract and transform different features from the audio files.
+        └── Adaptive_Pad_Layer.py         // Resize features to a common dimension.
     └── Utils                     
         ├── Class_information.py          // Class names for dataset for the results script.
         ├── Compute_FDR.py                // Compute Fisher’s discriminant ratio.
@@ -86,11 +79,11 @@ https://github.com/Peeples-Lab/HLTDNN
         ├── Get_Optimizer.py              // Define a set of optimizers to choose from.
         ├── Histogram_Model.py            // Load histogram model with TDNN (or any backbone network).
         ├── Network_functions.py          // Contains functions to initialize, train, and test the model.
-        ├── RBFHistogramPooling.py        // Create histogram layer.
+        ├── RBFHistogramPooling.py        // Create histogram layer.        
+        ├── cam_function.py               // Compute and plot a class activation map.
         ├── Save_Results.py               // Save results from the demo script.
         ├── pytorchtools.py               // Implement early stopping to terminate training based on validation metrics.
         └── TDNN.py                       // Baseline TDNN model.
-
 
 ```
 
@@ -98,25 +91,25 @@ https://github.com/Peeples-Lab/HLTDNN
 
 This source code is licensed under the license found in the [`LICENSE`](LICENSE) file in the root directory of this source tree.
 
-This product is Copyright (c) 2023 J. Ritu, E. Barnes, R. Martell, A. Dine and J. Peeples. All rights reserved.
+This product is Copyright (c) 2024 A. Mohammadi, I. Masabarakiza, E. Barnes, D. Carreiro, A. Dine and J. Peeples. All rights reserved.
 
-## <a name="CitingHist"></a>Citing HLTDNN
+## <a name="CitingHist"></a>Citing
 
-If you use the Passive Sonar Classification classification code, please cite the following reference using the following entry.
+If you use the code, please cite the following reference using the following entry.
 
 **Plain Text:**
 
-J. Ritu, E. Barnes, R. Martell, A. Dine and J. Peeples, "Histogram Layer Time Delay Neural Network For Passive Sonar Classification," 2023 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA), in Press.
+A. Mohammadi, I. Masabarakiza, E. Barnes, D. Carreiro, A. Dine and J. Peeples, "Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks," 2024 IEEE.
 
 **BibTex:**
 
 ```
 @inproceedings{Ritu2023histogram,
-  title={Histogram layer time delay neural network for passive sonar classification},
-  author={Ritu, Jarin and Barnes, Ethan, and Martell, Riley, and  Van Dine, Alexandra, and Peeples, Joshua},
-  booktitle={2023 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA)},
+  title={Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks},
+  author={Mohammadi, Amirmohammad and Masabarakiza, Irene, and Barnes, Ethan, and Martell, Riley, and  Van Dine, Alexandra, and Peeples, Joshua},
+  booktitle={2024 IEEE},
   pages={TBD},
-  year={2023},
+  year={2024},
   organization={IEEE}
 }
 ```
