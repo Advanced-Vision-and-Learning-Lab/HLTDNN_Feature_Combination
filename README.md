@@ -20,6 +20,10 @@ In this repository, we provide the paper and code for "Investigation of Time-Fre
 The [`requirements.txt`](requirements.txt) file includes the necessary packages, and the packages will be installed using:
 
    ```pip install -r requirements.txt```
+   
+Or, for a more convenient option, a pre-configured environment is available for download through the provided link. This environment comes with all the essential packages already installed, ensuring a hassle-free setup process.
+
+[`Download environment`](https://drive.google.com/file/d/1aEYvnnuhuU3evd0FZ63ex2EdC1INGLMl/view?usp=sharing)
 
 ## Demo
 
