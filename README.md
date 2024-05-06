@@ -1,21 +1,20 @@
-# Histogram Layer Time Delay Neural Networks:
+# Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks:
 <p align="center">
   <img src="Figures/PicFull.png" alt="Workflow Diagram">
 </p>
 
 
-**Histogram Layer Time Delay Neural Networks For Passive Sonar Classification**
+**Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks**
 
 Amirmohammad Mohammadi, Irene Masabarakiza, Ethan Barnes, Davelle Carreiro, Alexandra Van Dine and Joshua Peeples
 
-Note: If this code is used, cite it: Amirmohammad Mohammadi, Irene Masabarakiza, Ethan Barnes, Davelle Carreiro, Alexandra Van Dine and Joshua Peeples. (2024, April 25) Initial Release (Version v1.0). 
+Note: If this code is used, please cite it: Amirmohammad Mohammadi, Irene Masabarakiza, Ethan Barnes, Davelle Carreiro, Alexandra Van Dine and Joshua Peeples. (2024, April 25) Initial Release (Version v1.0). 
 
 `Accepted to IEEE (LINK)
 
 In this repository, we provide the paper and code for "Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks"
 
 ## Installation Prerequisites
-
 
 The [`requirements.txt`](requirements.txt) file includes the necessary packages, and the packages will be installed using:
 
