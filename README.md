@@ -104,15 +104,4 @@ If you use the code, please cite the following reference using the following ent
 
 A. Mohammadi, I. Masabarakiza, E. Barnes, D. Carreiro, A. Dine and J. Peeples, "Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks," 2024 IEEE.
 
-**BibTex:**
 
-```
-@inproceedings{Ritu2023histogram,
-  title={Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks},
-  author={Mohammadi, Amirmohammad and Masabarakiza, Irene, and Barnes, Ethan, and Martell, Riley, and  Van Dine, Alexandra, and Peeples, Joshua},
-  booktitle={2024 IEEE},
-  pages={TBD},
-  year={2024},
-  organization={IEEE}
-}
-```
