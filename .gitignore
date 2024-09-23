@@ -6,3 +6,4 @@ Saved_Models/
 bash_scripts/
 best_accuracies.csv
 output.csv
+get_accuracies.py
