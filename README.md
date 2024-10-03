@@ -9,8 +9,8 @@
 Amirmohammad Mohammadi, Irene Masabarakiza, Ethan Barnes, Davelle Carreiro, Alexandra Van Dine and Joshua Peeples
 
 Note: If this code is used, please cite it: Amirmohammad Mohammadi, Irene Masabarakiza, Ethan Barnes, Davelle Carreiro, Alexandra Van Dine and Joshua Peeples. (2024, April 25) Initial Release (Version v1.0). 
-
-`Accepted to IEEE (LINK)
+[`Zendo`](https://doi.org/10.5281/zenodo.13886984).https://zenodo.org/records/13886984
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13886984.svg)](https://doi.org/10.5281/zenodo.13886984)
 
 In this repository, we provide the paper and code for "Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks"
 
