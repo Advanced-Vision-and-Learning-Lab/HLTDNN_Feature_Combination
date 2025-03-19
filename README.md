@@ -12,6 +12,10 @@ Note: If this code is used, please cite it: Amirmohammad Mohammadi, Irene Masaba
 [`Zendo`](https://doi.org/10.5281/zenodo.13886984).https://zenodo.org/records/13886984
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13886984.svg)](https://doi.org/10.5281/zenodo.13886984)
 
+Version v2.0:
+[arXiv](https://arxiv.org/abs/2409.13881)
+
+
 In this repository, we provide the paper and code for "Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks"
 
 ## Installation Prerequisites
