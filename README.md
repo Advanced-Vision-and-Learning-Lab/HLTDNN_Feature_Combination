@@ -104,8 +104,11 @@ This product is Copyright (c) 2024 A. Mohammadi, I. Masabarakiza, E. Barnes, D. 
 
 If you use the code, please cite the following reference using the following entry.
 
-**Plain Text:**
-
-A. Mohammadi, I. Masabarakiza, E. Barnes, D. Carreiro, A. Dine and J. Peeples, "Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks," 2024 IEEE.
+@article{mohammadi2024timefrequency,
+  title={Investigation of Time-Frequency Feature Combinations with Histogram Layer Time Delay Neural Networks},
+  author={Mohammadi, Amirmohammad and Masabarakiza, Irene and Barnes, Ethan and Carreiro, Davelle and Van Dine, Alexandra and Peeples, Joshua},
+  journal={arXiv preprint arXiv:2409.13881},
+  year={2024}
+}
 
 
